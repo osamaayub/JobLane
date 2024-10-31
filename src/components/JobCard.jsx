@@ -50,7 +50,7 @@ const JobCard = ({ job }) => {
 
             </div>
 
-            <div className='flex md:gap-8  gap-3 lg:text-lg  md:text-xs '>
+            <div className='flex md:gap-8  gap-3 lg:text-lg  md:text-sm text-xs '>
                 <span>{convertDateFormat(job.createdAt.substr(0, 10))}</span>
                 <span>{job.employmentType}</span>
                 <span>{job.location}</span>
