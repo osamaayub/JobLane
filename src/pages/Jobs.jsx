@@ -147,7 +147,7 @@ const Jobs = () => {
                     ))}
                   </ul>
                   <div className='flex flex-col justify-center items-center pt-5'>
-                    <p className='underline underline-offset-4 text-lg pb-3'>Salary</p>
+                    <p className=' underline underline-offset-4 text-lg pb-3'>Salary</p>
 
                     <Slider
                       color='indigo'
