@@ -151,7 +151,7 @@ const Jobs = () => {
 
                     <Slider
                       color='indigo'
-                      className='outline-none w-32'
+                      className='outline-none w-48'
                       value={salary}
                       onChange={setSalary}
                       min={0}
