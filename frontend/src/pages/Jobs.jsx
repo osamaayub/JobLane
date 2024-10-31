@@ -147,11 +147,11 @@ const Jobs = () => {
                     ))}
                   </ul>
                   <div className='flex flex-col justify-center items-center pt-5'>
-                    <p className=' underline underline-offset-4 text-lg pb-3'>Salary</p>
+                    <p className='underline-offset-4 text-lg pb-3'>Salary</p>
 
                     <Slider
                       color='indigo'
-                      className='outline-none w-48'
+                      className='outline-none w-32'
                       value={salary}
                       onChange={setSalary}
                       min={0}
