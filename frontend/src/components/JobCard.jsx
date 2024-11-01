@@ -32,8 +32,8 @@ const JobCard = ({ job }) => {
 
                 <div className='flex flex-col justify-between w-full md:w-3/4 lg:w-1/2 p-4 rounded-lg'>
                     {/* Job Title and Apply Button in the same row */}
-                    <div className='flex justify-between gap-1'>
-                        <div className='flex flex-col'>
+                    <div className='flex justify-between md:gap-4 gap-2'>
+                        <div className='flex flex-col gap-2'>
                             <p className='text-sm  whitespace-nowrap'>{job.title}</p>
                             <p className='text-sm'>{job.companyName}</p>
                             <p className='text-sm'>{job.exp}</p>
