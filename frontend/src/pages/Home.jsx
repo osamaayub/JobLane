@@ -83,10 +83,10 @@ const Home = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='flex justify-between text-sm'>
-                                                        <span>{convertDateFormat(job.createdAt)}</span>
-                                                        <span>{job.employmentType}</span>
-                                                        <span>{job.location}</span>
+                                                    <div className='flex  gap-x-1 justify-between'>
+                                                        <span className='whitespace-nowrap'>{convertDateFormat(job.createdAt)}</span>
+                                                        <span className='whitespace-nowrap'>{job.employmentType}</span>
+                                                        <span className='whitespace-nowrap'>{job.location}</span>
                                                     </div>
                                                 </Link>
                                             ))

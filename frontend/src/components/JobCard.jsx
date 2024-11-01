@@ -30,11 +30,11 @@ const JobCard = ({ job }) => {
                     <img src={job.companyLogo.url} className='w-[4rem]' alt="Company Logo" />
                 </div>
 
-                <div className='flex flex-col justify-between w-full'>
+                <div className='flex flex-col justify-between w-full md:w-3/4 lg:w-1/2 p-4 rounded-lg'>
                     {/* Job Title and Apply Button in the same row */}
-                    <div className='flex justify-between gap-2'>
+                    <div className='flex justify-between gap-1'>
                         <div className='flex flex-col'>
-                            <p className='md:text-sm text-lg'>{job.title}</p>
+                            <p className='text-sm  whitespace-nowrap'>{job.title}</p>
                             <p className='text-sm'>{job.companyName}</p>
                             <p className='text-sm'>{job.exp}</p>
                         </div>
@@ -50,9 +50,9 @@ const JobCard = ({ job }) => {
 
             </div>
 
-            <div className='flex md:gap-8  gap-3 lg:text-lg  md:text-sm text-xs '>
-                <span>{convertDateFormat(job.createdAt.substr(0, 10))}</span>
-                <span>{job.employmentType}</span>
+            <div className='flex   md:gap-4  gap-3 lg:text-base  mt-3 md:text-sm text-xs '>
+                <span className='whitespace-nowrap'>{convertDateFormat(job.createdAt.substr(0, 10))}</span>
+                <span className='whitespace-nowrap'>{job.employmentType}</span>
                 <span>{job.location}</span>
             </div>
         </Link >

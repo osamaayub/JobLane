@@ -211,7 +211,7 @@ const Jobs = () => {
                 </div>
 
                 {/* Right section for company filters */}
-                <div className='flex-1 i p-4 rounded-md'>
+                <div className='flex-1  p-4 rounded-md'>
                   <p className='text-lg flex justify-center underline underline-offset-4'>Companies</p>
                   <ul className='flex items-center pt-3 flex-col mb-3 gap-3'>
                     {companyData.map((e, i) => (
