@@ -30,9 +30,9 @@ const JobCard = ({ job }) => {
                     <img src={job.companyLogo.url} className='w-[4rem]' alt="Company Logo" />
                 </div>
 
-                <div className='flex flex-col justify-between w-full md:w-3/4 lg:w-1/2 p-4 rounded-lg'>
+                <div className='flex flex-col max-w-screen-md  w-full md:w-3/4 lg:w-1/2 p-2  rounded'>
                     {/* Job Title and Apply Button in the same row */}
-                    <div className='flex justify-between md:gap-4 gap-2'>
+                    <div className='flex justify-between space-y-2'>
                         <div className='flex flex-col gap-2'>
                             <p className='text-sm  whitespace-nowrap'>{job.title}</p>
                             <p className='text-sm'>{job.companyName}</p>
@@ -40,20 +40,20 @@ const JobCard = ({ job }) => {
                         </div>
                         {/* Apply button positioned here for all screens */}
                         <div className='absolute md:right-3 right-0 md:pt-2 top-3'>
-                            <button className='blueCol font-semibold md:text-xs text-xs px-1 py-1'>Apply</button>
+                            <button className='blueCol font-semibold md:text-xs md:mt-2  text-xs px-1 py-1'>Apply</button>
                         </div>
                     </div>
                     <div className='flex gap-2 items-center md:hidden'>
-                        <p className='text-sm text-white'>{job.description.slice(0, 20)}...</p>
+                        <p className='text-sm md:text-base text-gray-100'>{job.description.slice(0, 20)}...</p>
                     </div>
                 </div>
 
             </div>
 
-            <div className='flex   md:gap-4  gap-3 lg:text-base  mt-3 md:text-sm text-xs '>
+            <div className='flex   md:gap-4  p-4  gap-3 lg:text-base  mt-3 md:text-sm text-xs '>
                 <span className='whitespace-nowrap'>{convertDateFormat(job.createdAt.substr(0, 10))}</span>
                 <span className='whitespace-nowrap'>{job.employmentType}</span>
-                <span>{job.location}</span>
+                <span className='whitespace-nowrap'>{job.location}</span>
             </div>
         </Link >
     );
