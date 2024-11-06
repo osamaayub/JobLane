@@ -1,103 +1,94 @@
-/* eslint-disable no-unused-vars */
-import {
-    newPostRequest, newPostSuccess, newPostFail, allJobsRequest, allJobsSuccess, allJobsFail,
-    jobDetailsRequest, jobDetailsSuccess, jobDetailsFail, jobSaveRequest, jobSaveSuccess, jobSaveFail,
-    getSavedJobsRequest, getSavedJobsSuccess, getSavedJobsFail
-} from '../slices/JobSlice'
-import { toast } from 'react-toastify'
-import { Me } from './UserActions'
-import axiosRequest from '../config/server'
+import { toast } from 'react-toastify';
+import axiosRequest from '../config/server';
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-
-
-export const createJobPost = (jobData) => async (dispatch) => {
-    try {
-        dispatch(newPostRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+// Create Job Post
+export const createJobPost = createAsyncThunk(
+    'job/createJob',
+    async (jobData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
             }
+
+            const response = await axiosRequest.post("/create/job", jobData, config);
+            toast.success("Job posted successfully!")
+            return response.data;
+
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage); // return rejectWithValue
         }
-
-        const { data } = await axiosRequest.post("/api/v1/create/job", jobData, config);
-        dispatch(newPostSuccess());
-        toast.success("Job posted successfully !")
-
-    } catch (err) {
-        dispatch(newPostFail(err.response.data.message))
     }
-}
+)
 
-export const getAllJobs = () => async (dispatch) => {
-    try {
-        dispatch(allJobsRequest());
-
-        const { data } = await axiosRequest.get("/jobs");
-
-        dispatch(allJobsSuccess(data.Jobs));
-
-    } catch (err) {
-        dispatch(allJobsFail(err.response.data.message))
+// Get All Jobs
+export const getAllJobs = createAsyncThunk(
+    'job/getAllJobs', // Changed to 'job/getAllJobs'
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosRequest.get("/jobs");
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage); // return rejectWithValue
+        }
     }
-}
+);
 
-
-export const getSingleJob = (id) => async (dispatch) => {
-    try {
-        dispatch(jobDetailsRequest());
-
-        const { data } = await axiosRequest.get(`/job/${id}`);
-
-        dispatch(jobDetailsSuccess(data.job));
-
-    } catch (err) {
-        dispatch(jobDetailsFail(err.response.data.message))
+// Get Single Job
+export const getSingleJob = createAsyncThunk(
+    'job/getSingleJob', // Corrected the action name to match
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await axiosRequest.get(`/job/${id}`);
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage); // return rejectWithValue
+        }
     }
-}
+);
 
-export const saveJob = (id) => async (dispatch) => {
-    try {
-        dispatch(jobSaveRequest());
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+// Save Job
+export const saveJob = createAsyncThunk(
+    'job/saveJob', // Corrected the action name to match
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
             }
+            const response = await axiosRequest.get(`/saveJob/${id}`, config);
+            toast.success(response.data.message);
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage); // return rejectWithValue
         }
-
-
-
-        const { data } = await axiosRequest.get(`/saveJob/${id}`, config);
-
-        dispatch(Me())
-        dispatch(jobSaveSuccess());
-        toast.success(data.message)
-
-    } catch (err) {
-        dispatch(jobSaveFail(err.response.data.message));
     }
-}
+);
 
-
-export const getSavedJobs = () => async (dispatch) => {
-    try {
-        dispatch(getSavedJobsRequest())
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+// Get Saved Jobs
+export const getSavedJobs = createAsyncThunk(
+    'job/getSavedJobs', // Corrected the action name to match
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.get("/getSavedJobs", config);
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage); // return rejectWithValue
         }
-
-
-        const { data } = await axiosRequest.get("/getSavedJobs", config);
-
-        dispatch(getSavedJobsSuccess(data))
-
-    } catch (err) {
-        dispatch(getSavedJobsFail(err.response.data.message))
     }
-}
+);

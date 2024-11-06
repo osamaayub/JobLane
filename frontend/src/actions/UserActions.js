@@ -1,174 +1,152 @@
 /* eslint-disable no-unused-vars */
-import {
-    registerRequest, registerSuccess, registerFail, loginRequest, loginSuccess, loginFail
-    , isLoginRequest, isLoginSuccess, isLoginFail, getMeRequest, getMeSuccess, getMeFail,
-    changePasswordRequest, changePasswordSuccess, changePasswordFail,
-    updateProfileRequest, updateProfileSuccess, updateProfileFail,
-    deleteAccountRequest, deleteAccountSuccess, deleteAccountFail, logoutClearState
-} from '../slices/UserSlice'
-import { toast } from 'react-toastify'
-import axiosRequest from "../config/server"
+import { toast } from 'react-toastify';
+import axiosRequest from "../config/server";
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-
-export const registerUser = (userData) => async (dispatch) => {
-    try {
-        dispatch(registerRequest())
-
-        const { data } = await axiosRequest.post("/register", userData);
-
-        dispatch(registerSuccess())
-        localStorage.setItem('userToken', data.token)
-        dispatch(logOrNot())
-        toast.success("Registration successful !")
-
-    } catch (err) {
-        dispatch(registerFail(err.response.data.message))
-        if (err.response.data.message.includes("duplicate")) {
-            toast.error("User already exists.")
-        } else {
-            toast.error(err.response.data.message)
-        }
-    }
-}
-
-
-export const loginUser = (userData) => async (dispatch) => {
-    try {
-        dispatch(loginRequest())
-
-        const { data } = await axiosRequest.post("/login", userData);
-
-        dispatch(loginSuccess())
-        localStorage.setItem('userToken', data.token)
-        dispatch(logOrNot())
-        dispatch(Me())
-        toast.success("Login successful !")
-
-    } catch (err) {
-        dispatch(loginFail(err.response.data.message))
-        toast.error(err.response.data.message)
-    }
-}
-
-
-export const logOrNot = () => async (dispatch) => {
-    try {
-        dispatch(isLoginRequest())
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+// Register User Action
+export const registerUser = createAsyncThunk(
+    'user/register',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const response = await axiosRequest.post("/register", userData);
+            localStorage.setItem('userToken', response.data.token);
+            toast.success("Registration successful !");
+            return response.data;
+        } catch (err) {
+            if (err?.response?.data?.message.includes("duplicate")) {
+                toast.error("User already exists");
+                return rejectWithValue("User already exists");
+            } else {
+                const message = err?.response?.data?.message || err.message;
+                toast.error(message);
+                return rejectWithValue("Registration failed");
             }
         }
-
-        const { data } = await axiosRequest.get("/isLogin", config);
-
-        dispatch(isLoginSuccess(data.isLogin))
-
-
-
-    } catch (err) {
-        dispatch(isLoginFail())
     }
-}
+);
 
+// Login User Action
+export const loginUser = createAsyncThunk(
+    'user/loginUser',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const response = await axiosRequest.post("/login", userData);
+            localStorage.setItem('userToken', response.data.token);
+            toast.success("Login successful !");
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
 
-export const Me = () => async (dispatch) => {
-    try {
-        dispatch(getMeRequest())
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+// Check if User is Logged In
+export const logOrNot = createAsyncThunk(
+    'user/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.get("/isLogin", config);
+            return response.data.isLogin;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+// Fetch Logged-in User's Info (Me)
+export const Me = createAsyncThunk(
+    'user/Me',
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.get("/me", config);
+            localStorage.setItem("role", response.data.user.role);
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+// Change Password Action
+export const changePass = createAsyncThunk(
+    'user/changePassword',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.put("/changePassword", userData, config);
+            toast.success("Password changed successfully !");
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+// Update Profile Action
+export const updateProfile = createAsyncThunk(
+    'user/updateProfile',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.put("/updateProfile", userData, config);
+            toast.success("Profile updated successfully !");
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+// Delete Account Action
+export const deleteAccount = createAsyncThunk(
+    'user/deleteAccount',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const response = await axiosRequest.put("/deleteAccount", userData, config);
+
+            if (response.data.message === "Account Deleted") {
+                toast.success("Account deleted successfully !");
+                localStorage.removeItem('userToken');
+            } else {
+                toast.error("Wrong password !");
             }
+            return response.data;
+        } catch (err) {
+            const errorMessage = err?.response?.data?.message || err.message;
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
         }
-
-        const { data } = await axiosRequest.get("/me", config);
-
-        localStorage.setItem("role", data.user.role)
-
-        dispatch(getMeSuccess(data.user))
-
-    } catch (err) {
-        dispatch(getMeFail())
     }
-}
-
-
-export const changePass = (userData) => async (dispatch) => {
-    try {
-        dispatch(changePasswordRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
-        }
-
-        const { data } = await axiosRequest.put("/changePassword", userData, config)
-
-        dispatch(changePasswordSuccess())
-        toast.success("Password Changed successfully !")
-
-    } catch (err) {
-        dispatch(changePasswordFail(err.response.data.message))
-        toast.error(err.response.data.message)
-    }
-}
-
-
-export const updateProfile = (userData) => async (dispatch) => {
-    try {
-        dispatch(updateProfileRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
-        }
-
-        const { data } = await axiosRequest.put("/updateProfile", userData, config)
-
-        dispatch(updateProfileSuccess())
-        toast.success("Profile Updated successfully !")
-        dispatch(Me())
-
-    } catch (err) {
-        dispatch(updateProfileFail(err.response.data.message))
-        toast.error(err.response.data.message)
-    }
-}
-
-
-export const deleteAccount = (userData) => async (dispatch) => {
-    try {
-        console.log(userData)
-
-
-        dispatch(deleteAccountRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
-        }
-
-        const { data } = await axiosRequest.put("/deleteAccount", userData, config)
-
-        console.log(data)
-
-        dispatch(deleteAccountSuccess())
-        if (data.message === "Account Deleted") {
-            toast.success("Account Deleted successfully !")
-            localStorage.removeItem('userToken')
-            dispatch(logOrNot())
-            dispatch(logoutClearState())
-        } else {
-            toast.error("Wrong Password !")
-        }
-
-
-    }
-    catch (err) {
-        dispatch(deleteAccountFail(err.response.data.message))
-        toast.error(err.response.data.message)
-    }
-}
+);
