@@ -7,6 +7,7 @@ import {
     saveJob
 } from "../actions/JobActions";
 
+// Initial State
 const initialState = {
     loading: false,
     saveJobLoading: false,
@@ -15,10 +16,7 @@ const initialState = {
         __v: 0,
         _id: "",
         category: "",
-        companyLogo: {
-            public_id: "",
-            url: ""
-        },
+        companyLogo: { public_id: "", url: "" },
         companyName: "",
         createdAt: "",
         description: "",
@@ -35,34 +33,27 @@ const initialState = {
     allJobs: []
 };
 
+// Job Slice
 const JobSlice = createSlice({
     name: 'Job',
     initialState,
-    reducers: {
-        resetJobDetails: (state) => {
-            state.jobDetails = initialState.jobDetails;
-        },
-        resetError: (state) => {
-            state.error = null;
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
+        // Handle createJobPost
         builder.addCase(createJobPost.pending, (state) => {
             state.loading = true;
-            state.error = null;
         });
-        builder.addCase(createJobPost.fulfilled, (state, action) => {
+        builder.addCase(createJobPost.fulfilled, (state) => {
             state.loading = false;
-            state.allJobs = [...state.allJobs, action.payload];
         });
         builder.addCase(createJobPost.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload || action.error.message;
+            state.error = action.payload;
         });
 
+        // Handle getAllJobs
         builder.addCase(getAllJobs.pending, (state) => {
             state.loading = true;
-            state.error = null;
         });
         builder.addCase(getAllJobs.fulfilled, (state, action) => {
             state.loading = false;
@@ -70,28 +61,12 @@ const JobSlice = createSlice({
         });
         builder.addCase(getAllJobs.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload || action.error.message;
+            state.error = action.payload;
         });
 
-        builder.addCase(getSavedJobs.pending, (state) => {
-            state.loading = true;
-            state.saveJobLoading = true;
-            state.error = null;
-        });
-        builder.addCase(getSavedJobs.fulfilled, (state, action) => {
-            state.loading = false;
-            state.saveJobLoading = false;
-            state.savedJobs = action.payload;
-        });
-        builder.addCase(getSavedJobs.rejected, (state, action) => {
-            state.loading = false;
-            state.saveJobLoading = false;
-            state.error = action.payload || action.error.message;
-        });
-
+        // Handle getJobDetails
         builder.addCase(getSingleJob.pending, (state) => {
             state.loading = true;
-            state.error = null;
         });
         builder.addCase(getSingleJob.fulfilled, (state, action) => {
             state.loading = false;
@@ -99,24 +74,34 @@ const JobSlice = createSlice({
         });
         builder.addCase(getSingleJob.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload || action.error.message;
+            state.error = action.payload;
         });
 
+        // Handle saveJob
         builder.addCase(saveJob.pending, (state) => {
-            state.loading = true;
-            state.error = null;
+            state.saveJobLoading = true;
         });
-        builder.addCase(saveJob.fulfilled, (state, action) => {
-            state.loading = false;
+        builder.addCase(saveJob.fulfilled, (state) => {
             state.saveJobLoading = false;
-            state.savedJobs = action.payload;
         });
         builder.addCase(saveJob.rejected, (state, action) => {
+            state.saveJobLoading = false;
+            state.error = action.payload;
+        });
+
+        // Handle getSavedJobs
+        builder.addCase(getSavedJobs.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getSavedJobs.fulfilled, (state, action) => {
             state.loading = false;
-            state.error = action.payload || action.error.message;
+            state.savedJobs = action.payload.savedJob;
+        });
+        builder.addCase(getSavedJobs.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
         });
     }
 });
 
-export const { resetJobDetails, resetError } = JobSlice.actions;
 export default JobSlice.reducer;
