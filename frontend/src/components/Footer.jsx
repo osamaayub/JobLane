@@ -5,7 +5,7 @@ import { AiFillInstagram, AiFillMail } from 'react-icons/ai';
 
 const Footer = () => {
   return (
-    <div className="bg-gray-900  text-white py-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols:4 gap-6">
+    <div className="bg-gray-950  text-white py-5 grid grid-cols-1 md:grid-cols-3 lg:grid-cols:4 gap-6">
       {/* Navigation Links */}
       <div className="flex  md:flex-row justify-center items-center  gap-4">
         <Link to="/" className="text-white hover:text-blue-400 hover:underline">
@@ -48,7 +48,7 @@ const Footer = () => {
           <Link
             target="_blank"
             className="underline  textwhite md:text-sm"
-            to="https://www.github.com/osamaayub/HubHive"
+            to="https://www.github.com/osamaayub/job-lane-frontend"
           >
             Osama Ayub
           </Link>
