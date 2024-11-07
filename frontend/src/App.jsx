@@ -5,6 +5,7 @@ import {
   Navbar,
   Footer,
 } from "./components";
+import { ErrorBoundary } from "react-error-boundary";
 
 
 import ScrollToTopWhenRouteChanges from "./components/ScrollToTopOnRouteChange";
@@ -19,6 +20,19 @@ import { getAllJobs } from './actions/JobActions'
 import AppRoutes from './routes';
 
 
+
+
+
+const FallBackComponent = ({ error, resetErrorBoundary }) => {
+  <div className='p-20 text-center text-red-500'>
+    <pre>
+      {error.message}
+      <button onClick={resetErrorBoundary}
+      className="p-10 mt-10">Try Again</button>
+    </pre>
+  </div>
+
+}
 
 
 const App = () => {
@@ -50,25 +64,27 @@ const App = () => {
 
   return (
     <>
-      <ScrollToTopWhenRouteChanges />
-      <Navbar />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        className="mt-14 font-bold  "
+      <ErrorBoundary fallback={<FallBackComponent/>}>
+        <ScrollToTopWhenRouteChanges />
+        <Navbar />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          className="mt-14 font-bold  "
 
-      />
-      <AppRoutes />
+        />
+        <AppRoutes />
 
-      <Footer />
+        <Footer />
+      </ErrorBoundary>
 
 
 
