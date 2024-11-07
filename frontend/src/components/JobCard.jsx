@@ -43,14 +43,14 @@ const JobCard = ({ job }) => {
                             <button className='blueCol font-semibold md:text-xs md:mt-2   text-xs px-1 py-1'>Apply</button>
                         </div>
                     </div>
-                    <div className='flex gap-2 items-center md:hidden'>
-                        <p className='text-sm md:text-base text-white'>{job.description.slice(0, 10)}...</p>
+                    <div className='flex gap-2 items-center'>
+                        <p className='text-sm md:text-base text-white'>{job.description.slice(0, 25)}...</p>
                     </div>
                 </div>
 
             </div>
 
-            <div className='flex md:gap-4  p-4  gap-3 lg:text-base  mt-3 md:text-sm text-xs '>
+            <div className='flex md:gap-4  p-4  justify-between gap-3 lg:text-base  mt-3 md:text-sm text-xs '>
                 <span className='whitespace-nowrap'>{convertDateFormat(job.createdAt.substr(0, 10))}</span>
                 <span className='whitespace-nowrap'>{job.employmentType}</span>
                 <span className='whitespace-nowrap'>{job.location}</span>
