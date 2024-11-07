@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import { useEffect } from 'react'
-import {
-  Navbar,
-  Footer,
-} from "./components";
+import { useEffect ,lazy,Suspense} from 'react';
+const Navbar=lazy(()=>import('./components/Navbar'));
+const Footer=lazy(()=>import('./components/Footer'));
 import { ErrorBoundary } from "react-error-boundary";
 
 
@@ -24,15 +22,18 @@ import AppRoutes from './routes';
 
 
 const FallBackComponent = ({ error, resetErrorBoundary }) => {
-  <div className='p-20 text-center text-red-500'>
-    <pre>
-      {error.message}
-      <button onClick={resetErrorBoundary}
-      className="p-10 mt-10">Try Again</button>
-    </pre>
-  </div>
+  return (
+    <div className="p-20 text-center text-red-500">
+      <p>
+        {error.message}
+      </p>
+      <button onClick={resetErrorBoundary} className="p-10 mt-10">
+        Try Again
+      </button>
+    </div>
+  );
+};
 
-}
 
 
 const App = () => {
@@ -65,6 +66,7 @@ const App = () => {
   return (
     <>
       <ErrorBoundary fallback={<FallBackComponent/>}>
+      <Suspense fallback={<div>Loading...</div>}>
         <ScrollToTopWhenRouteChanges />
         <Navbar />
         <ToastContainer
@@ -78,12 +80,13 @@ const App = () => {
           draggable
           pauseOnHover
           theme="dark"
-          className="mt-14 font-bold  "
+          className="mt-14 font-bold"
 
         />
         <AppRoutes />
 
         <Footer />
+        </Suspense>
       </ErrorBoundary>
 
 

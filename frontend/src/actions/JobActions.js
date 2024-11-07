@@ -12,7 +12,7 @@ export const createJobPost = createAsyncThunk(
                 },
             };
 
-            const { data } = await axiosRequest.post('/api/v1/create/job', jobData, config);
+            const { data } = await axiosRequest.post('/create/job', jobData, config);
             return data;
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;

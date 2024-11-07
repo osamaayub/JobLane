@@ -96,7 +96,11 @@ const CreateJob = () => {
         <div className=' flex justify-center w-full items-start pt-6'>
 
 
-          <form onSubmit={postHandler} className=' md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8' action="">
+          <form
+            onSubmit={postHandler}
+            className=' md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8'
+            id="form"
+          >
             <div className='flex flex-col w-full justify-start items-start pt-4 gap-3'>
               <div className='text-4xl pb-1 font-medium border-b border-gray-500 w-full'>
                 Post Job
@@ -108,7 +112,9 @@ const CreateJob = () => {
                     <MdOutlineWorkOutline size={20} />
                   </div>
                   <input
-                    value={title} onChange={(e) => setTitle(e.target.value)}
+                    value={title}
+                    id="title"
+                    onChange={(e) => setTitle(e.target.value)}
                     required placeholder='Job Title' type="text" className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
                 </div>
 
@@ -120,7 +126,9 @@ const CreateJob = () => {
                     <BiBuilding size={20} />
                   </div>
                   <input
-                    value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+                    value={companyName}
+                    id="company"
+                    onChange={(e) => setCompanyName(e.target.value)}
                     required placeholder='Company Name' type="text" className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
                 </div>
 
@@ -179,8 +187,13 @@ const CreateJob = () => {
                     <MdAttachMoney size={20} />
                   </div>
                   <input
-                    value={salary} onChange={(e) => setSalary(e.target.value)}
-                    required placeholder='Salary' type="text" className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
+                    id="salary"
+                    value={salary}
+                    onChange={(e) => setSalary(e.target.value)}
+                    required
+                    placeholder='Salary'
+                    type="text"
+                    className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
                 </div>
 
               </div>
@@ -194,7 +207,9 @@ const CreateJob = () => {
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder='Job Description' type="text" className='outline-none w-full text-black bold-placeholder px-1 pr-3 py-2' />
+                    placeholder='Job Description'
+                    type="text"
+                    className='outline-none w-full text-black bold-placeholder px-1 pr-3 py-2' />
                 </div>
 
               </div>
@@ -216,7 +231,11 @@ const CreateJob = () => {
                 <div className='bg-white flex justify-center items-center'>
 
 
-                  <select required onChange={(e) => setCategory(e.target.value)} value={category} name="" id="large" className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
+                  <select required
+                    onChange={(e) => setCategory(e.target.value)}
+                    value={category}
+                    id="large"
+                    className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
                     <option value="category">Select Category</option>
                     <option value="Technology">Technology</option>
                     <option value="Marketing">Marketing</option>
@@ -231,7 +250,10 @@ const CreateJob = () => {
                 <div className='bg-white flex justify-center items-center'>
 
 
-                  <select required onChange={(e) => setEmploymentType(e.target.value)} value={employmentType} name="" id="large" className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
+                  <select required onChange={(e) => setEmploymentType(e.target.value)}
+                    value={employmentType}
+                    id="large"
+                    className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
                     <option value="employmentType">Select Employment Type</option>
                     <option value="full-time">Full-time</option>
                     <option value="part-time">Part-time</option>
@@ -262,7 +284,8 @@ const CreateJob = () => {
 
 
 
-          <form onSubmit={postHandler} className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8' action="">
+          <form onSubmit={postHandler}
+            className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8' action="">
 
             <div className='md:px-10 px-2 pt-4 pb-20 w-full flex flex-col gap-4'>
               <div className='text-center border-gray-500 border-b'>
