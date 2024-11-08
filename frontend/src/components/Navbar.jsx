@@ -16,7 +16,7 @@ import { logoutClearState } from '../slices/UserSlice';
 import useIsMobile from '../hooks/useIsMobile';
 
 const Navbar = () => {
-    const { isLogin, me } = useSelector(state => state.user);
+    const { isLogin, me} = useSelector(state => state.user);
     const [toggle, setToggle] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();

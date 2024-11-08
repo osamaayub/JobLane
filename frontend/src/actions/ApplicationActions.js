@@ -1,18 +1,12 @@
 /* eslint-disable no-unused-vars */
-import {
-    createApplicationRequest, createApplicationSuccess, createApplicationFail,
-    allAppliedJobsRequest, allAppliedJobsSuccess, allAppliedJobsFail,
-    applicationDetailsRequest, applicationDetailsSuccess, applicationDetailsFail,
-    deleteApplicationRequest, deleteApplicationSuccess, deleteApplicationFail
-} from '../slices/ApplicationSlice'
-
-import { Me } from '../actions/UserActions';
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 import axiosRequest from '../config/server';
+import {createAsyncThunk}from "@reduxjs/toolkit";
 
-export const createApplication = (id) => async (dispatch) => {
+export const createApplication =createAsyncThunk(
+    'application/createApplication'
+    ,async(id,{rejectWithValue})=>{
     try {
-        dispatch(createApplicationRequest())
 
         const config = {
             headers: {
@@ -21,82 +15,82 @@ export const createApplication = (id) => async (dispatch) => {
         }
 
 
-        const { data } = await axiosRequest.post(`/createApplication/${id}`, config, config);
-
-
-        dispatch(createApplicationSuccess())
-        toast.success("Applied Successfully")
-        dispatch(Me())
+        const response = await axiosRequest.post(`/createApplication/${id}`, config);
+        toast.success("Applied Successfully");
+        return response.data;
 
     } catch (err) {
-        dispatch(createApplicationFail(err.response.data.message))
-        toast.error(err.response.data.message)
-        dispatch(Me())
+        const errorMessage=err?.response?.data?.message||err.message;
+        toast.error(errorMessage);
+        rejectWithValue(errorMessage);
+       
     }
-}
+
+})
+    
 
 
-export const getAppliedJob = () => async (dispatch) => {
-    try {
 
-        dispatch(allAppliedJobsRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+export const getAppliedJob =createAsyncThunk(
+    'application/getAllApplication',
+    async({rejectWithValue})=>{
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
             }
+
+            const response = await axiosRequest.get("/getAllApplication", config);
+            return response.data;
+
+        } catch (err) {
+            const errorMessage=err?.response?.data?.message ||err.message;
+            rejectWithValue(errorMessage);
         }
 
-        const { data } = await axiosRequest.get("/getAllApplication", config);
-
-        dispatch(allAppliedJobsSuccess(data.allApplications))
-
-    } catch (err) {
-        dispatch(allAppliedJobsFail())
-    }
-}
+});
 
 
-export const getSingleApplication = (id) => async (dispatch) => {
-    try {
 
-        dispatch(applicationDetailsRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+export const getSingleApplication =createAsyncThunk(
+    'application/getSingleApplication',
+    async(id,{rejectWithValue})=>{
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
             }
+
+            const response = await axiosRequest.get(`/singleApplication/${id}`, config);
+            return response.data;
+
+        } catch (err) {
+            const errorMessage=err?.response?.data?.message ||err.message;
+            rejectWithValue(errorMessage);
         }
 
-        const { data } = await axiosRequest.get(`/singleApplication/${id}`, config);
+    });
 
-        dispatch(applicationDetailsSuccess(data.application))
+export const deleteApplication = createAsyncThunk(
+    'application/deleteApplication',
+    async(id,{rejectWithValue})=>{
+        try {
 
-    } catch (err) {
-        dispatch(applicationDetailsFail())
-    }
-}
-
-export const deleteApplication = (id) => async (dispatch) => {
-    try {
-
-        dispatch(deleteApplicationRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
             }
+
+            const response = await axiosRequest.delete(`/deleteApplication/${id}`, config);
+            toast.success("Application Deleted Successfully !");
+            return response.data;
+
+        } catch (err) {
+           const errorMessage=err?.response?.data?.message ||err.message;
+           rejectWithValue(errorMessage);
         }
 
-        const { data } = await axiosRequest.delete(`/deleteApplication/${id}`, config)
-
-        dispatch(deleteApplicationSuccess())
-        dispatch(getAppliedJob())
-        dispatch(Me())
-
-        toast.success("Application Deleted Successfully !")
-
-    } catch (err) {
-        dispatch(deleteApplicationFail(err.response.data.message))
-    }
-}
+});

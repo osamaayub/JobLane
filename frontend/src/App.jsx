@@ -28,7 +28,7 @@ const FallBackComponent = ({ error, resetErrorBoundary }) => {
         {error.message}
       </p>
       <button onClick={resetErrorBoundary} className="p-10 mt-10">
-        Try Again
+        Reload Page
       </button>
     </div>
   );
@@ -65,7 +65,9 @@ const App = () => {
 
   return (
     <>
-      <ErrorBoundary fallback={<FallBackComponent/>}>
+      <ErrorBoundary fallback={<FallBackComponent/>}
+      onError={()=>console.log("Unexpected Error Occured")}
+      >
       <Suspense fallback={<div>Loading...</div>}>
         <ScrollToTopWhenRouteChanges />
         <Navbar />
