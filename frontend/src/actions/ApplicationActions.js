@@ -7,7 +7,6 @@ export const createApplication =createAsyncThunk(
     'application/createApplication'
     ,async(id,{rejectWithValue})=>{
     try {
-
         const config = {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('userToken')}`
