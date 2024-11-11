@@ -231,7 +231,8 @@ const CreateJob = () => {
                 <div className='bg-white flex justify-center items-center'>
 
 
-                  <select required
+                  <select 
+                  required
                     onChange={(e) => setCategory(e.target.value)}
                     value={category}
                     id="large"
