@@ -1,280 +1,220 @@
-/* eslint-disable no-unused-vars */
-import {
-    getAllJobsRequest, getAllJobsSuccess, getAllJobsFail,
-    getAllUsersRequest, getAllUsersSuccess, getAllUsersFail,
-    getAllAppRequest, getAllAppSuccess, getAllAppFail,
-    getAppRequest, getAppSuccess, getAppFail,
-    updateAppRequest, updateAppSuccess, updateAppFail,
-    deleteAppRequest, deleteAppSuccess, deleteAppFail,
-    getUserRequest, getUserSuccess, getUserFail,
-    updateUserRequest, updateUserSuccess, updateUserFail,
-    deleteUserRequest, deleteUserSuccess, deleteUserFail,
-    getJobRequest, getJobSuccess, getJobFail,
-    updateJobRequest, updateJobSuccess, updateJobFail,
-    deleteJobRequest, deleteJobSuccess, deleteJobFail
-} from '../slices/AdminSlice'
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import axiosRequest from "../config/server";
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
-
-export const getAllJobsAdmin = () => async (dispatch) => {
-    try {
-        dispatch(getAllJobsRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getAllJobsAdmin = createAsyncThunk(
+    'admin/getAllJobsAdmin',
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get("/admin/allJobs", config);
+            return data.jobs;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get("/admin/allJobs", config);
-
-        dispatch(getAllJobsSuccess(data.jobs))
-
-    } catch (err) {
-        dispatch(getAllJobsFail(err.response.data.message));
     }
-}
+);
 
-export const getAllUsersAdmin = () => async (dispatch) => {
-    try {
-        dispatch(getAllUsersRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getAllUsersAdmin = createAsyncThunk(
+    'admin/getAllUsersAdmin',
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get("/admin/allUsers", config);
+            return data.users;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get("/admin/allUsers", config);
-
-        dispatch(getAllUsersSuccess(data.users))
-
-    } catch (err) {
-        dispatch(getAllUsersFail(err.response.data.message));
     }
-}
+);
 
-
-export const getAllAppAdmin = () => async (dispatch) => {
-    try {
-        dispatch(getAllAppRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getAllAppAdmin = createAsyncThunk(
+    'admin/getAllAppAdmin',
+    async (_, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get("/admin/allApp", config);
+            return data.applications;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get("/admin/allApp", config);
-
-        dispatch(getAllAppSuccess(data.applications))
-
-    } catch (err) {
-        dispatch(getAllAppFail(err.response.data.message));
     }
-}
+);
 
-
-export const getAppData = (id) => async (dispatch) => {
-    try {
-        dispatch(getAppRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getAppData = createAsyncThunk(
+    'admin/getAppData',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get(`/admin/getApplication/${id}`, config);
+            return data.application;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get(`/admin/getApplication/${id}`, config)
-
-        dispatch(getAppSuccess(data.application))
-
-    } catch (err) {
-        dispatch(getAppFail(err.response.data.message))
     }
-}
+);
 
-
-export const updateApplication = (id, dataBody) => async (dispatch) => {
-    try {
-
-        if (dataBody.status === "not") {
-            toast.info("Please Select Status !")
-        } else {
-            dispatch(updateAppRequest())
-
+export const updateApplication = createAsyncThunk(
+    'admin/updateApplication',
+    async ({ id, dataBody }, { rejectWithValue }) => {
+        try {
+            if (dataBody.status === "not") {
+                toast.info("Please Select Status !");
+                return;
+            }
 
             const config = {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`
                 }
-            }
+            };
 
-            // eslint-disable-next-line no-unused-vars
-            const { data } = await axiosRequest.put(`/admin/updateApplication/${id}`, dataBody, config)
+            await axiosRequest.put(`/admin/updateApplication/${id}`, dataBody, config);
 
-            dispatch(updateAppSuccess())
-            dispatch(getAppData(id))
-            toast.success("Status Updated !")
+            toast.success("Status Updated !");
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-    } catch (err) {
-        dispatch(updateAppFail(err.response.data.message))
     }
-}
+);
 
-
-export const deleteApp = (id) => async (dispatch) => {
-    try {
-
-        dispatch(deleteAppRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const deleteApp = createAsyncThunk(
+    'admin/deleteApp',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            await axiosRequest.delete(`/admin/deleteApplication/${id}`, config);
+            toast.success("Application Deleted !");
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        // eslint-disable-next-line no-unused-vars
-        const { data } = await axiosRequest.delete(`/admin/deleteApplication/${id}`, config)
-
-
-        dispatch(getAllAppAdmin())
-        dispatch(deleteAppSuccess())
-        toast.success("Application Deleted !")
-
-    } catch (err) {
-        dispatch(deleteAppFail(err.response.data.message))
     }
-}
+);
 
-
-
-export const getUserData = (id) => async (dispatch) => {
-    try {
-
-        dispatch(getUserRequest())
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getUserData = createAsyncThunk(
+    'admin/getUserData',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get(`/admin/getUser/${id}`, config);
+            return data.user;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get(`/admin/getUser/${id}`, config)
-
-        dispatch(getUserSuccess(data.user))
-
-    } catch (err) {
-        dispatch(getUserFail(err.response.data.message));
     }
-}
+);
 
-
-export const updateUser = (id, userData) => async (dispatch) => {
-    try {
-        dispatch(updateUserRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const updateUser = createAsyncThunk(
+    'admin/updateUser',
+    async ({ id, userData }, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            await axiosRequest.put(`/admin/updateUser/${id}`, userData, config);
+            toast.success("Role Updated Successfully !");
+            return { id, userData };
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.put(`/admin/updateUser/${id}`, userData, config)
-
-        dispatch(getUserData(id));
-        toast.success("Role Updated Successfully !")
-        dispatch(updateUserSuccess())
-
-    } catch (err) {
-        dispatch(updateUserFail(err.response.data.message))
     }
-}
+);
 
-
-export const deleteUser = (id) => async (dispatch) => {
-    try {
-        dispatch(deleteUserRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const deleteUser = createAsyncThunk(
+    'admin/deleteUser',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            await axiosRequest.delete(`/admin/deleteUser/${id}`, config);
+            toast.success("User Deleted Successfully !");
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.delete(`/admin/deleteUser/${id}`, config)
-
-        dispatch(getAllUsersAdmin());
-        toast.success("User Deleted Successfully !")
-        dispatch(deleteUserSuccess())
-
-    } catch (err) {
-        dispatch(deleteUserFail(err.response.data.message))
     }
-}
+);
 
-
-export const getJobData = (id) => async (dispatch) => {
-    try {
-        dispatch(getJobRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const getJobData = createAsyncThunk(
+    'admin/getJobData',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            const { data } = await axiosRequest.get(`/admin/getJob/${id}`, config);
+            return data.job;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.get(`/admin/getJob/${id}`, config);
-
-        dispatch(getJobSuccess(data.job))
-
-    } catch (err) {
-        dispatch(getJobFail(err.response.data.message));
     }
-}
+);
 
-export const updateJobData = (id, jobData) => async (dispatch) => {
-    try {
-        dispatch(updateJobRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const updateJobData = createAsyncThunk(
+    'admin/updateJobData',
+    async ({ id, jobData }, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            await axiosRequest.put(`/admin/updateJob/${id}`, jobData, config);
+            toast.success("Job Updated Successfully !");
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.put(`/admin/updateJob/${id}`, jobData, config);
-
-        dispatch(updateJobSuccess())
-        dispatch(getAllJobsAdmin())
-        dispatch(getJobData(id))
-        toast.success("Job Updated Successfully !")
-
-    } catch (err) {
-        dispatch(updateJobFail(err.response.data.message));
     }
-}
+);
 
-
-export const deleteJobData = (id) => async (dispatch) => {
-    try {
-        dispatch(deleteJobRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('userToken')}`
-            }
+export const deleteJobData = createAsyncThunk(
+    'admin/deleteJobData',
+    async (id, { rejectWithValue }) => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                }
+            };
+            await axiosRequest.delete(`/admin/deleteJob/${id}`, config);
+            toast.success("Job Deleted Successfully !");
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response.data.message);
         }
-
-        const { data } = await axiosRequest.delete(`/admin/deleteJob/${id}`, config);
-
-        dispatch(deleteJobSuccess())
-        dispatch(getAllJobsAdmin())
-        toast.success("Job Deleted Successfully !")
-
-    } catch (err) {
-        dispatch(deleteJobFail(err.response.data.message));
     }
-}
+);

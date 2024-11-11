@@ -17,6 +17,8 @@ const ViewAllJobAdmin = () => {
   const { loading, allJobs } = useSelector((state) => state.admin)
   const [sideTog, setSideTog] = useState(false)
 
+
+
   useEffect(() => {
     dispatch(getAllJobsAdmin());
     // eslint-disable-next-line react-hooks/exhaustive-deps

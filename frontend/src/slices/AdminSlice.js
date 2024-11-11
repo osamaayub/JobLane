@@ -1,8 +1,21 @@
-/* eslint-disable no-undef */
-import { createSlice } from '@reduxjs/toolkit'
+import {
+    getAllAppAdmin,
+    getAllUsersAdmin,
+    getAllJobsAdmin,
+    getAppData,
+    getJobData,
+    getUserData,
+    updateApplication,
+    updateJobData,
+    deleteApp,
+    deleteUser,
+    deleteJobData
+} from "../actions/AdminActions";
+
+import { createSlice } from "@reduxjs/toolkit";
 
 const AdminSlice = createSlice({
-    name: `admin`,
+    name: 'admin',
     initialState: {
         loading: false,
         allJobs: null,
@@ -50,170 +63,126 @@ const AdminSlice = createSlice({
             salary: ""
         }
     },
-    reducers: {
-        getAllJobsRequest: (state) => {
-            state.loading = true
-        },
-        getAllJobsSuccess: (state, action) => {
-            state.loading = false
-            state.allJobs = action.payload
-        },
-        getAllJobsFail: (state, action) => {
-            state.loading = false
-            error = action.payload
-        },
-
-
-        getAllUsersRequest: (state) => {
-            state.loading = true
-        },
-        getAllUsersSuccess: (state, action) => {
-            state.loading = false
-            state.allUsers = action.payload
-        },
-        // eslint-disable-next-line no-unused-vars
-        getAllUsersFail: (state, action) => {
-            state.loading = false
-        },
-
-
-        getAllAppRequest: (state) => {
-            state.loading = true
-        },
-        getAllAppSuccess: (state, action) => {
-            state.loading = false
-            state.allApplications = action.payload
-        },
-        getAllAppFail: (state, action) => {
-            state.loading = false
-            error = action.payload
-        },
-
-        getAppRequest: (state) => {
-            state.loading = true
-        },
-        getAppSuccess: (state, action) => {
-            state.loading = false
-            state.applicationData = action.payload
-        },
-        getAppFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-        updateAppRequest: (state) => {
-            state.loading = true
-        },
-        updateAppSuccess: (state) => {
-            state.loading = false
-        },
-        updateAppFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-        deleteAppRequest: (state) => {
-            state.loading = true
-        },
-        deleteAppSuccess: (state) => {
-            state.loading = false
-        },
-        deleteAppFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-
-        getUserRequest: (state) => {
-            state.loading = true
-        },
-        getUserSuccess: (state, action) => {
-            state.loading = false
-            state.userData = action.payload
-        },
-        getUserFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-
-        updateUserRequest: (state) => {
-            state.loading = true
-        },
-        updateUserSuccess: (state) => {
-            state.loading = false
-        },
-        updateUserFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-        deleteUserRequest: (state) => {
-            state.loading = true
-        },
-        deleteUserSuccess: (state) => {
-            state.loading = false
-        },
-        deleteUserFail: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        },
-
-        getJobRequest: (state) => {
+    reducers: {},
+    extraReducers: (builder) => {
+        // Jobs
+        builder.addCase(getAllJobsAdmin.pending, (state) => {
             state.loading = true;
-        },
-        getJobSuccess: (state, action) => {
+        });
+        builder.addCase(getAllJobsAdmin.fulfilled, (state, action) => {
             state.loading = false;
-            state.jobData = action.payload
-        },
-        getJobFail: (state, action) => {
+            state.allJobs = action.payload;
+        });
+        builder.addCase(getAllJobsAdmin.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
-        },
+        });
 
-
-        updateJobRequest: (state) => {
+        builder.addCase(getJobData.pending, (state) => {
             state.loading = true;
-        },
-        updateJobSuccess: (state) => {
+        });
+        builder.addCase(getJobData.fulfilled, (state, action) => {
             state.loading = false;
-        },
-        updateJobFail: (state, action) => {
+            state.jobData = action.payload;
+        });
+        builder.addCase(getJobData.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload
-        },
+            state.error = action.payload;
+        });
 
-
-        deleteJobRequest: (state) => {
+        // Users
+        builder.addCase(getAllUsersAdmin.pending, (state) => {
             state.loading = true;
-        },
-        deleteJobSuccess: (state) => {
+        });
+        builder.addCase(getAllUsersAdmin.fulfilled, (state, action) => {
             state.loading = false;
-        },
-        deleteJobFail: (state, action) => {
+            state.allUsers = action.payload;
+        });
+        builder.addCase(getAllUsersAdmin.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload
-        },
+            state.error = action.payload;
+        });
 
+        builder.addCase(getUserData.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getUserData.fulfilled, (state, action) => {
+            state.loading = false;
+            state.userData = action.payload;
+        });
+        builder.addCase(getUserData.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        // Applications
+        builder.addCase(getAllAppAdmin.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getAllAppAdmin.fulfilled, (state, action) => {
+            state.loading = false;
+            state.allApplications = action.payload;
+        });
+        builder.addCase(getAllAppAdmin.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(getAppData.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(getAppData.fulfilled, (state, action) => {
+            state.loading = false;
+            state.applicationData = action.payload;
+        });
+        builder.addCase(getAppData.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(updateApplication.fulfilled, (state, action) => {
+            state.loading = false;
+        });
+        builder.addCase(updateApplication.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(deleteApp.fulfilled, (state, action) => {
+            state.loading = false;
+        });
+        builder.addCase(deleteApp.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(updateJobData.fulfilled, (state, action) => {
+            state.loading = false;
+            state.jobData = action.payload;  // Update job data with the new details
+        });
+        builder.addCase(updateJobData.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(deleteJobData.fulfilled, (state, action) => {
+            state.loading = false;
+            state.allJobs = state.allJobs.filter(job => job.id !== action.payload.id); // Remove deleted job from the list
+        });
+        builder.addCase(deleteJobData.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
+
+        builder.addCase(deleteUser.fulfilled, (state, action) => {
+            state.loading = false;
+            state.allUsers = state.allUsers.filter(user => user.id !== action.payload.id); // Remove deleted user from the list
+        });
+        builder.addCase(deleteUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
     }
-})
+});
 
-export const {
-    getAllJobsRequest, getAllJobsSuccess, getAllJobsFail,
-    getAllUsersRequest, getAllUsersSuccess, getAllUsersFail,
-    getAllAppRequest, getAllAppSuccess, getAllAppFail,
-
-    getAppRequest, getAppSuccess, getAppFail,
-    updateAppRequest, updateAppSuccess, updateAppFail,
-    deleteAppRequest, deleteAppSuccess, deleteAppFail,
-
-    getUserRequest, getUserSuccess, getUserFail,
-    updateUserRequest, updateUserSuccess, updateUserFail,
-    deleteUserRequest, deleteUserSuccess, deleteUserFail,
-
-    getJobRequest, getJobSuccess, getJobFail,
-    updateJobRequest, updateJobSuccess, updateJobFail,
-    deleteJobRequest, deleteJobSuccess, deleteJobFail
-
-} = AdminSlice.actions;
 export default AdminSlice.reducer;

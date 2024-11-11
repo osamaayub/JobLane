@@ -24,10 +24,11 @@ import AppRoutes from './routes';
 const FallBackComponent = ({ error, resetErrorBoundary }) => {
   return (
     <div className="p-20 text-center text-red-500">
-      <p>
-        {error.message}
+      <p className='text-white  mt-4'>
+        {error?.message}
       </p>
-      <button onClick={resetErrorBoundary} className="p-10 mt-10">
+      <button onClick={resetErrorBoundary} 
+      className="mt-4 bg-blue-800 text-white rounded-full p-2">
         Reload Page
       </button>
     </div>

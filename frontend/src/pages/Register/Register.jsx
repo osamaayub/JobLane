@@ -199,7 +199,7 @@ const Register = () => {
           <button
             disabled={loading}
             type="submit"
-            className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg w-full transition duration-300 ease-in-out ${loading ? 'cursor-not-allowed opacity-70' : ''}`}
+            className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full transition duration-300 ease-in-out ${loading ? 'cursor-not-allowed opacity-70' : ''}`}
           >
             {loading ? <TbLoader2 className="animate-spin inline-block" size={20} /> : 'Register'}
           </button>

@@ -90,7 +90,7 @@ const Login = () => {
 
             <button
               disabled={loading}
-              className='w-full py-3 rounded-md bg-blue-500 text-white font-semibold hover:bg-red-500 disabled:opacity-50 flex justify-center items-center'
+              className='w-full py-3 rounded-full bg-blue-500 text-white font-semibold hover:bg-red-500 disabled:opacity-50 flex justify-center items-center'
             >
               {loading ? <TbLoader2 className='animate-spin' size={24} /> : "Login"}
             </button>
