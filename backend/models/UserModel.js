@@ -1,37 +1,34 @@
 const mongoose = require('mongoose')
-
+const validator = require('validator')
 
 const UserSchema = new mongoose.Schema({
 
 
     name: {
         type: String,
-        required: true
+        required: [true, "Please enter your name"]
     },
 
     email: {
         type: String,
         required: true,
+        validate: [validator.isEmail, "Please Enter valid email address"],
         unique: true
     },
 
     password: {
         type: String,
-        required: true,
-        min: 1,
-        max: 8
+        required: [true, "Please enter a password"]
     },
 
     avatar: {
         public_id: {
             type: String,
             required: true
-
         },
         url: {
             type: String,
             required: true
-
         },
     },
 
@@ -75,8 +72,7 @@ const UserSchema = new mongoose.Schema({
         default: Date.now
     }
 
-
-}, { timestamp: true })
+})
 
 const User = mongoose.model('User', UserSchema)
 module.exports = User
