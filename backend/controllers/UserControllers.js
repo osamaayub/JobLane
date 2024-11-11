@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
             message: "User Created",
             user,
             token
-        })
+        });
     } catch (err) {
         res.status(500).json({
             success: false,

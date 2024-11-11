@@ -1,3 +1,4 @@
+
 const Job = require('../models/JobModel')
 const User = require('../models/UserModel')
 const Application = require('../models/AppModel')
@@ -8,12 +9,6 @@ const cloudinary = require('cloudinary')
 exports.getAllJobs = async (req, res) => {
     try {
         const jobs = await Job.find();
-        if (!jobs) {
-            return res.status(400).json({
-                sucess: false,
-                message: "job not found"
-            })
-        }
 
         res.status(200).json({
             success: true,
