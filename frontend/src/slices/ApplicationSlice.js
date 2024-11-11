@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
-    createApplication
-    , getAppliedJob,
+    createApplication,
+    getAppliedJob,
     getSingleApplication,
     deleteApplication
 } from "../actions/ApplicationActions";
@@ -33,48 +33,61 @@ const ApplicationSlice = createSlice({
     },
     reducers: {},
     extraReducers: (builder) => {
-        //create Application
-        builder.addCase(createApplication.pending, (state) => {
-            state.loading = true;
-        }
-        ).addCase(createApplication.fulfilled, (state, action) => {
-            state.loading = false;
-        }).addCase(createApplication.rejected, (state, action) => {
-           state.loading=false;
-           state.error=action.payload;
-          //get Applied Jobs
-        }).addCase(getAppliedJob.pending,(state)=>{
-              state.loading=false;
-        }).addCase(getAppliedJob.fulfilled,(state,action)=>{
-            state.loading=false;
-            state.appliedJobs=action.payload;
+        // Create Application
+        builder
+            .addCase(createApplication.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createApplication.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(createApplication.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
-        }).addCase(getAppliedJob.rejected,(state,action)=>{
-            state.loading=false;
-            state.error=action.payload;
-          
-        })
-            //delete Application
-        .addCase(deleteApplication.pending,(state)=>{
-          state.loading=true;
+            // Get Applied Jobs
+            .addCase(getAppliedJob.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAppliedJob.fulfilled, (state, action) => {
+                state.loading = false;
+                state.appliedJobs = Array.isArray(action.payload) ? action.payload : []
+            })
+            .addCase(getAppliedJob.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
-        }).addCase(deleteApplication.fulfilled,(state)=>{
-          state.loading=false;
-        }).addCase(deleteApplication.rejected,(state,action)=>{
-             state.loading=false;
-             state.error=action.payload;
-        })
-        //get Single Applications
-        .addCase(getSingleApplication.pending,(state)=>{
-            state.loading=true;
-        }).addCase(getSingleApplication.fulfilled,(state,action)=>{
-             state.loading=false;
-             state.applicationDetails=action.payload;
-        }).addCase(getSingleApplication.rejected,(state,action)=>{
-            state.loading=false;
-            state.error=action.payload;
-        });
+            // Delete Application
+            .addCase(deleteApplication.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteApplication.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(deleteApplication.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
+            // Get Single Application
+            .addCase(getSingleApplication.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSingleApplication.fulfilled, (state, action) => {
+                state.loading = false;
+                state.applicationDetails = action.payload;
+            })
+            .addCase(getSingleApplication.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
-})
-export default ApplicationSlice.reducer
+});
+
+export default ApplicationSlice.reducer;
