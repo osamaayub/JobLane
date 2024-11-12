@@ -22,7 +22,7 @@ export const createApplication = createAsyncThunk(
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
             toast.error(errorMessage);
-            rejectWithValue(errorMessage);
+            return rejectWithValue(errorMessage);
 
         }
 
@@ -33,7 +33,7 @@ export const createApplication = createAsyncThunk(
 
 export const getAppliedJob = createAsyncThunk(
     'application/getAllApplication',
-    async ({ rejectWithValue }) => {
+    async (_,{ rejectWithValue }) => {
         try {
             const config = {
                 headers: {
@@ -46,7 +46,7 @@ export const getAppliedJob = createAsyncThunk(
 
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
-            rejectWithValue(errorMessage);
+            return  rejectWithValue(errorMessage);
         }
 
     });
@@ -68,7 +68,7 @@ export const getSingleApplication = createAsyncThunk(
 
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
-            rejectWithValue(errorMessage);
+            return  rejectWithValue(errorMessage);
         }
 
     });
@@ -90,7 +90,7 @@ export const deleteApplication = createAsyncThunk(
 
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
-            rejectWithValue(errorMessage);
+            return  rejectWithValue(errorMessage);
         }
 
     });
