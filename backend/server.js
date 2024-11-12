@@ -34,7 +34,7 @@ app.use(fileUpload({ useTempFiles: true }));
 
 // CORS Configuration
 app.use(cors({
-    origin: "*",
+    origin:process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
