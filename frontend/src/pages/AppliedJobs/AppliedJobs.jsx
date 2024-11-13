@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom'
 const AppliedJobs = () => {
 
   const { loading, appliedJobs } = useSelector(state => state.application);
+  const dispatch=useDispatch();
 
 
   useEffect(() => {

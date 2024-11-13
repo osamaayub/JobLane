@@ -1,15 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
 import useIsMobile from '../hooks/useIsMobile'
+
 
 
 // eslint-disable-next-line no-unused-vars
 const AppliedJobCard = ({ id, job, time }) => {
 
     // eslint-disable-next-line no-unused-vars
-    const dispatch = useDispatch()
 
     const convertDateFormat = (inputDate) => {
         const parts = inputDate.split('-');
@@ -68,6 +67,7 @@ const AppliedJobCard = ({ id, job, time }) => {
             </div>
 
         </div>
+        
     )
 }
 export default AppliedJobCard;

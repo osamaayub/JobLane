@@ -41,8 +41,8 @@ export const getAppliedJob = createAsyncThunk(
                 }
             }
 
-            const response = await axiosRequest.get("/getAllApplication", config);
-            return response.data;
+            const {data} = await axiosRequest.get("/getAllApplication", config);
+            return data.allApplications;
 
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
@@ -62,7 +62,6 @@ export const getSingleApplication = createAsyncThunk(
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`
                 }
             }
-
             const response = await axiosRequest.get(`/singleApplication/${id}`, config);
             return response.data;
 
