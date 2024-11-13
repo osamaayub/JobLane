@@ -1,61 +1,69 @@
 const User = require('../models/UserModel')
 const bcrypt = require('bcrypt')
+const {hashPassword,comparePassword}=require("../utils");
 const { createToken } = require('../middlewares/auth')
 const cloudinary = require('cloudinary').v2;
 
 
 
-
 exports.register = async (req, res) => {
     try {
+        const { name, email, password, skills } = req.body;
 
 
-        const { name, email, password, avatar, skills, resume } = req.body;
-
-
-        const myCloud = await cloudinary.uploader.upload(avatar, {
+        // Upload avatar to Cloudinary
+        const avatarUpload = await cloudinary.uploader.upload(avatar, {
             folder: 'avatar',
+            crop:'scale'
+        });
 
-            crop: "scale",
-        })
-
-        const myCloud2 = await cloudinary.uploader.upload(resume, {
+        // Upload resume to Cloudinary (use resource_type: 'raw' for PDFs)
+        const resumeUpload = await cloudinary.uploader.upload(resume, {
             folder: 'resume',
+        });
 
-            crop: "fit",
-        })
+        // Hash the password
+        const hashPass = await hashPassword(password);
 
-        const hashPass = await bcrypt.hash(password, 10)
+        // Create the user with avatar and resume URLs
         const user = await User.create({
             name,
             email,
             password: hashPass,
             avatar: {
-                public_id: myCloud.public_id,
-                url: myCloud.secure_url
+                public_id: avatarUpload.public_id,
+                url: avatarUpload.secure_url,
             },
             skills,
             resume: {
-                public_id: myCloud2.public_id,
-                url: myCloud2.secure_url
-            }
-        })
+                public_id: resumeUpload.public_id,
+                url: resumeUpload.secure_url,
+            },
+        });
 
-        const token = createToken(user._id, user.email)
+        // Create a token for the user
+        const token = createToken(user._id, user.email);
 
+        // Send the response with token and user data
         res.status(201).json({
             success: true,
-            message: "User Created",
+            message: 'User registered successfully',
             user,
-            token
+            token,
         });
+
     } catch (err) {
+        console.error(err);
         res.status(500).json({
             success: false,
-            message: err.message
-        })
+            message: err.message || 'Something went wrong',
+        });
     }
-}
+};
+
+
+
+
 
 
 
@@ -67,7 +75,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { email, password, role } = req.body;
+        const { email, password} = req.body;
         if (!email || !password) {
             return res.status(400).json({
                 sucess: false,
@@ -84,7 +92,7 @@ exports.login = async (req, res) => {
             })
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = comparePassword(password,user.password);
 
         if (!isMatch) {
             return res.status(401).json({
@@ -171,7 +179,7 @@ exports.changePassword = async (req, res) => {
 
         const userPassword = user.password;
 
-        const isMatch = await bcrypt.compare(oldPassword, userPassword);
+        const isMatch = comparePassword(oldPassword, userPassword);
 
         if (!isMatch) {
             return res.status(401).json({
@@ -194,7 +202,7 @@ exports.changePassword = async (req, res) => {
             })
         }
 
-        const hashPass = await bcrypt.hash(newPassword, 10);
+        const hashPass =hashPassword(newPassword);
 
         user.password = hashPass;
 

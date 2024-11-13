@@ -78,7 +78,6 @@ exports.getUsersAllApplications = async (req, res) => {
             allApplications
         })
 
-
     } catch (err) {
         res.status(500).json({
             success: false,

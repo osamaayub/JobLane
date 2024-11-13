@@ -9,7 +9,6 @@ dotenv.config({ path: './config/config.env' });
 const databaseConnection = require('./config/database');
 const express = require('express');
 const cors = require('cors');
-const fileUpload = require('express-fileupload');
 const errorMiddleware = require('./middlewares/error');
 
 // Database Connection
@@ -30,11 +29,10 @@ const app = express();
 // Middleware Configuration
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
-app.use(fileUpload({ useTempFiles: true }));
 
 // CORS Configuration
 app.use(cors({
-    origin:process.env.FRONTEND_URL,
+    origin:"*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
