@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
-import { Loader } from "../../components/Loader"
+import { Loader } from '../../components/Loader';
 import { MetaData } from '../../components/MetaData';
 import { AiOutlineMail } from 'react-icons/ai';
 import { MdPermIdentity, MdOutlineFeaturedPlayList } from 'react-icons/md';
@@ -55,7 +55,13 @@ const EditProfile = () => {
         if (skills.constructor !== Array) {
             skillArr = skills.split(",");
         }
+         const formData=new FormData();
 
+        formData.append("name",name),
+        formData.append("email",email),
+        formData.append("avatar", avatar);
+        formData.append("resume", resume),
+        formData.append("skills", JSON.stringify(skillArr))
         const data = {
             newName: name,
             newEmail: email,
@@ -63,7 +69,6 @@ const EditProfile = () => {
             newResume: resume,
             newSkills: skillArr,
         };
-
         dispatch(updateProfile(data));
     };
 
@@ -94,7 +99,6 @@ const EditProfile = () => {
                             <form
                                 onSubmit={editHandler}
                                 className="flex flex-col md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-3 pb-28"
-                                action=""
                             >
                                 <div className="md:px-10 px-7 pb-6 w-full shadow-sm shadow-gray-700 border-gray-700 border pt-5  flex flex-col gap-4">
                                     <div className="text-center">

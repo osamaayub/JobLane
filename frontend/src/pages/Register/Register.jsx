@@ -36,15 +36,13 @@ const Register = () => {
 
   const onSubmit = (data) => {
     const skillsArr = data.skills.split(',').map(skill => skill.trim());
-    const formData = {
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      avatar,
-      resume,
-      skills: skillsArr,
-    };
-
+    const formData = new FormData();
+    formData.append("name", data.name),
+      formData.append("email", data.email),
+      formData.append("password", data.password),
+      formData.append("avatar", avatar);
+      formData.append("resume", resume),
+      formData.append("skills", JSON.stringify(skillsArr));
     // Dispatch the registerUser action
     dispatch(registerUser(formData));
 
@@ -73,7 +71,7 @@ const Register = () => {
         if (reader.readyState === 2) {
           setAvatar(reader.result);
           setAvatarName(file.name);
-          setValue('avatar', file); // Update the avatar in react-hook-form
+          setValue('avatar', file);
         }
       };
       reader.readAsDataURL(file);
@@ -88,7 +86,7 @@ const Register = () => {
         if (reader.readyState === 2) {
           setResume(reader.result);
           setResumeName(file.name);
-          setValue('resume', file); // Update the resume in react-hook-form
+          setValue('resume', file);
         }
       };
       reader.readAsDataURL(file);

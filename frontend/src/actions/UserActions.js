@@ -8,7 +8,11 @@ export const registerUser = createAsyncThunk(
     'user/register',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await axiosRequest.post("/register", userData);
+            const response = await axiosRequest.post("/register", userData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data' // Ensure the content type is multipart/form-data
+                },
+            });
             localStorage.setItem('userToken', response.data.token);
             toast.success("Registration successful !");
             return response.data;
@@ -110,6 +114,7 @@ export const updateProfile = createAsyncThunk(
         try {
             const config = {
                 headers: {
+                    'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`
                 }
             };

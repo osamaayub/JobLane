@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axiosRequest from '../config/server'; // Adjust based on your axios instance
+import axiosRequest from '../config/server';
+import {toast}from "react-toastify"; // Adjust based on your axios instance
 
 // Async Thunks
 export const createJobPost = createAsyncThunk(
@@ -59,6 +60,7 @@ export const saveJob = createAsyncThunk(
             };
 
             const { data } = await axiosRequest.get(`/saveJob/${id}`, config);
+            toast.success("Job saved Sucessfully")
             return data;
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
