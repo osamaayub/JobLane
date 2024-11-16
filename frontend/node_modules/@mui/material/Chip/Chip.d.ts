@@ -15,7 +15,7 @@ export interface ChipOwnProps {
   /**
    * The Avatar element to display.
    */
-  avatar?: React.ReactElement;
+  avatar?: React.ReactElement<unknown>;
   /**
    * This prop isn't supported.
    * Use the `component` prop if you need to change the children structure.
@@ -37,7 +37,7 @@ export interface ChipOwnProps {
   /**
    * The color of the component.
    * It supports both default and custom theme colors, which can be added as shown in the
-   * [palette customization guide](https://mui.com/material-ui/customization/palette/#adding-new-colors).
+   * [palette customization guide](https://mui.com/material-ui/customization/palette/#custom-colors).
    * @default 'default'
    */
   color?: OverridableStringUnion<
@@ -47,7 +47,7 @@ export interface ChipOwnProps {
   /**
    * Override the default delete icon element. Shown only if `onDelete` is set.
    */
-  deleteIcon?: React.ReactElement;
+  deleteIcon?: React.ReactElement<unknown>;
   /**
    * If `true`, the component is disabled.
    * @default false
@@ -56,7 +56,7 @@ export interface ChipOwnProps {
   /**
    * Icon element.
    */
-  icon?: React.ReactElement;
+  icon?: React.ReactElement<unknown>;
   /**
    * The content of the component.
    */

@@ -1,4 +1,4 @@
-import type { Action, AnyAction } from 'redux'
+import type { Action } from 'redux'
 import type {
   CaseReducer,
   CaseReducers,
@@ -6,7 +6,7 @@ import type {
 } from './createReducer'
 import type { TypeGuard } from './tsHelpers'
 
-export interface TypedActionCreator<Type extends string> {
+export type TypedActionCreator<Type extends string> = {
   (...args: any[]): Action<Type>
   type: Type
 }
@@ -26,7 +26,7 @@ export interface ActionReducerMapBuilder<State> {
    */
   addCase<ActionCreator extends TypedActionCreator<string>>(
     actionCreator: ActionCreator,
-    reducer: CaseReducer<State, ReturnType<ActionCreator>>
+    reducer: CaseReducer<State, ReturnType<ActionCreator>>,
   ): ActionReducerMapBuilder<State>
   /**
    * Adds a case reducer to handle a single exact action type.
@@ -37,7 +37,7 @@ export interface ActionReducerMapBuilder<State> {
    */
   addCase<Type extends string, A extends Action<Type>>(
     type: Type,
-    reducer: CaseReducer<State, A>
+    reducer: CaseReducer<State, A>,
   ): ActionReducerMapBuilder<State>
 
   /**
@@ -46,7 +46,7 @@ export interface ActionReducerMapBuilder<State> {
    * If multiple matcher reducers match, all of them will be executed in the order
    * they were defined in - even if a case reducer already matched.
    * All calls to `builder.addMatcher` must come after any calls to `builder.addCase` and before any calls to `builder.addDefaultCase`.
-   * @param matcher - A matcher function. In TypeScript, this should be a [type predicate](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates)
+   * @param matcher - A matcher function. In TypeScript, this should be a [type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
    *   function
    * @param reducer - The actual case reducer function.
    *
@@ -56,7 +56,7 @@ import {
   createAction,
   createReducer,
   AsyncThunk,
-  AnyAction,
+  UnknownAction,
 } from "@reduxjs/toolkit";
 
 type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>;
@@ -68,8 +68,8 @@ type FulfilledAction = ReturnType<GenericAsyncThunk["fulfilled"]>;
 const initialState: Record<string, string> = {};
 const resetAction = createAction("reset-tracked-loading-state");
 
-function isPendingAction(action: AnyAction): action is PendingAction {
-  return action.type.endsWith("/pending");
+function isPendingAction(action: UnknownAction): action is PendingAction {
+  return typeof action.type === "string" && action.type.endsWith("/pending");
 }
 
 const reducer = createReducer(initialState, (builder) => {
@@ -98,7 +98,7 @@ const reducer = createReducer(initialState, (builder) => {
    */
   addMatcher<A>(
     matcher: TypeGuard<A> | ((action: any) => boolean),
-    reducer: CaseReducer<State, A extends AnyAction ? A : A & AnyAction>
+    reducer: CaseReducer<State, A extends Action ? A : A & Action>,
   ): Omit<ActionReducerMapBuilder<State>, 'addCase'>
 
   /**
@@ -120,38 +120,38 @@ const reducer = createReducer(initialState, builder => {
 })
 ```
    */
-  addDefaultCase(reducer: CaseReducer<State, AnyAction>): {}
+  addDefaultCase(reducer: CaseReducer<State, Action>): {}
 }
 
 export function executeReducerBuilderCallback<S>(
-  builderCallback: (builder: ActionReducerMapBuilder<S>) => void
+  builderCallback: (builder: ActionReducerMapBuilder<S>) => void,
 ): [
   CaseReducers<S, any>,
   ActionMatcherDescriptionCollection<S>,
-  CaseReducer<S, AnyAction> | undefined
+  CaseReducer<S, Action> | undefined,
 ] {
   const actionsMap: CaseReducers<S, any> = {}
   const actionMatchers: ActionMatcherDescriptionCollection<S> = []
-  let defaultCaseReducer: CaseReducer<S, AnyAction> | undefined
+  let defaultCaseReducer: CaseReducer<S, Action> | undefined
   const builder = {
     addCase(
       typeOrActionCreator: string | TypedActionCreator<any>,
-      reducer: CaseReducer<S>
+      reducer: CaseReducer<S>,
     ) {
       if (process.env.NODE_ENV !== 'production') {
         /*
-         to keep the definition by the user in line with actual behavior, 
+         to keep the definition by the user in line with actual behavior,
          we enforce `addCase` to always be called before calling `addMatcher`
          as matching cases take precedence over matchers
          */
         if (actionMatchers.length > 0) {
           throw new Error(
-            '`builder.addCase` should only be called before calling `builder.addMatcher`'
+            '`builder.addCase` should only be called before calling `builder.addMatcher`',
           )
         }
         if (defaultCaseReducer) {
           throw new Error(
-            '`builder.addCase` should only be called before calling `builder.addDefaultCase`'
+            '`builder.addCase` should only be called before calling `builder.addDefaultCase`',
           )
         }
       }
@@ -159,9 +159,15 @@ export function executeReducerBuilderCallback<S>(
         typeof typeOrActionCreator === 'string'
           ? typeOrActionCreator
           : typeOrActionCreator.type
+      if (!type) {
+        throw new Error(
+          '`builder.addCase` cannot be called with an empty action type',
+        )
+      }
       if (type in actionsMap) {
         throw new Error(
-          'addCase cannot be called with two reducers for the same action type'
+          '`builder.addCase` cannot be called with two reducers for the same action type ' +
+            `'${type}'`,
         )
       }
       actionsMap[type] = reducer
@@ -169,19 +175,19 @@ export function executeReducerBuilderCallback<S>(
     },
     addMatcher<A>(
       matcher: TypeGuard<A>,
-      reducer: CaseReducer<S, A extends AnyAction ? A : A & AnyAction>
+      reducer: CaseReducer<S, A extends Action ? A : A & Action>,
     ) {
       if (process.env.NODE_ENV !== 'production') {
         if (defaultCaseReducer) {
           throw new Error(
-            '`builder.addMatcher` should only be called before calling `builder.addDefaultCase`'
+            '`builder.addMatcher` should only be called before calling `builder.addDefaultCase`',
           )
         }
       }
       actionMatchers.push({ matcher, reducer })
       return builder
     },
-    addDefaultCase(reducer: CaseReducer<S, AnyAction>) {
+    addDefaultCase(reducer: CaseReducer<S, Action>) {
       if (process.env.NODE_ENV !== 'production') {
         if (defaultCaseReducer) {
           throw new Error('`builder.addDefaultCase` can only be called once')

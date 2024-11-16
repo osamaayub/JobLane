@@ -9,7 +9,7 @@ import { OverwriteCSSProperties } from './OverwriteCSSProperties';
  * Note that this extends to non-theme values also. For example `display=['none', 'block']`
  * will also works.
  */
-export type ResponsiveStyleValue<T> = T | Array<T | null> | { [key: string]: T | null };
+export type ResponsiveStyleValue<T> = T | ReadonlyArray<T | null> | { [key: string]: T | null };
 
 /**
  * Map of all CSS pseudo selectors (`:hover`, `:focus`, ...).
@@ -51,7 +51,7 @@ export type SystemCssProperties<Theme extends object = {}> = {
   [K in keyof AllSystemCSSProperties]:
     | ResponsiveStyleValue<AllSystemCSSProperties[K]>
     | ((theme: Theme) => ResponsiveStyleValue<AllSystemCSSProperties[K]>)
-    | SystemStyleObject<Theme>;
+    | null;
 };
 
 /**

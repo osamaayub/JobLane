@@ -24,7 +24,7 @@ export interface ButtonOwnProps {
   /**
    * The color of the component.
    * It supports both default and custom theme colors, which can be added as shown in the
-   * [palette customization guide](https://mui.com/material-ui/customization/palette/#adding-new-colors).
+   * [palette customization guide](https://mui.com/material-ui/customization/palette/#custom-colors).
    * @default 'primary'
    */
   color?: OverridableStringUnion<
@@ -104,7 +104,7 @@ export interface ExtendButtonTypeMap<TypeMap extends OverridableTypeMap> {
 
 export type ExtendButton<TypeMap extends OverridableTypeMap> = ((
   props: { href: string } & OverrideProps<ExtendButtonBaseTypeMap<TypeMap>, 'a'>,
-) => JSX.Element) &
+) => React.JSX.Element) &
   OverridableComponent<ExtendButtonBaseTypeMap<TypeMap>>;
 
 /**

@@ -120,6 +120,7 @@ export const updateProfile = createAsyncThunk(
             };
             const response = await axiosRequest.put("/updateProfile", userData, config);
             toast.success("Profile updated successfully !");
+            console.log(userData);
             return response.data;
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;

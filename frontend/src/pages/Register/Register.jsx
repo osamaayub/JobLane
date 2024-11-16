@@ -55,13 +55,13 @@ const Register = () => {
   };
 
   useEffect(() => {
-    if (registrationSucess) {
+    if (!registrationSucess) {
       navigate('/login');
     }
     if (isLogin) {
       navigate('/');
     }
-  }, [isLogin, navigate, registrationSucess]);
+  }, [isLogin, registrationSucess]);
 
   const avatarChange = (e) => {
     const file = e.target.files[0];

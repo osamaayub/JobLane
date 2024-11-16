@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { SxProps } from '@mui/system';
 import { OverrideProps } from '@mui/types';
-import { SlotComponentProps } from '@mui/base';
+import { SlotComponentProps } from '../utils/types';
 import { PortalProps } from '../Portal';
 import { Theme } from '../styles';
 import Backdrop, { BackdropProps } from '../Backdrop';
@@ -43,14 +43,14 @@ export interface ModalOwnProps {
    */
   BackdropComponent?: React.ElementType<BackdropProps>;
   /**
-   * Props applied to the [`Backdrop`](/material-ui/api/backdrop/) element.
+   * Props applied to the [`Backdrop`](https://mui.com/material-ui/api/backdrop/) element.
    * @deprecated Use `slotProps.backdrop` instead.
    */
   BackdropProps?: Partial<BackdropProps>;
   /**
    * A single child content element.
    */
-  children: React.ReactElement;
+  children: React.ReactElement<unknown>;
   /**
    * Override or extend the styles applied to the component.
    */
@@ -67,8 +67,7 @@ export interface ModalOwnProps {
   /**
    * The components used for each slot inside.
    *
-   * This prop is an alias for the `slots` prop.
-   * It's recommended to use the `slots` prop instead.
+   * @deprecated Use the `slots` prop instead. This prop will be removed in v7. See [Migrating from deprecated APIs](https://mui.com/material-ui/migration/migrating-from-deprecated-apis/) for more details.
    *
    * @default {}
    */
@@ -80,8 +79,7 @@ export interface ModalOwnProps {
    * The extra props for the slot components.
    * You can override the existing props or add new ones.
    *
-   * This prop is an alias for the `slotProps` prop.
-   * It's recommended to use the `slotProps` prop instead, as `componentsProps` will be deprecated in the future.
+   * @deprecated Use the `slotProps` prop instead. This prop will be removed in v7. See [Migrating from deprecated APIs](https://mui.com/material-ui/migration/migrating-from-deprecated-apis/) for more details.
    *
    * @default {}
    */
@@ -92,6 +90,9 @@ export interface ModalOwnProps {
   /**
    * An HTML element or function that returns one.
    * The `container` will have the portal children appended to it.
+   *
+   * You can also provide a callback, which is called in a React layout effect.
+   * This lets you set the container from a ref, and also makes server-side rendering possible.
    *
    * By default, it uses the body of the top-level document object,
    * so it's simply `document.body` most of the time.
@@ -210,10 +211,10 @@ export declare const ModalRoot: React.FC<ModalRootProps>;
 /**
  * Modal is a lower-level construct that is leveraged by the following components:
  *
- * *   [Dialog](https://mui.com/material-ui/api/dialog/)
- * *   [Drawer](https://mui.com/material-ui/api/drawer/)
- * *   [Menu](https://mui.com/material-ui/api/menu/)
- * *   [Popover](https://mui.com/material-ui/api/popover/)
+ * * [Dialog](https://mui.com/material-ui/api/dialog/)
+ * * [Drawer](https://mui.com/material-ui/api/drawer/)
+ * * [Menu](https://mui.com/material-ui/api/menu/)
+ * * [Popover](https://mui.com/material-ui/api/popover/)
  *
  * If you are creating a modal dialog, you probably want to use the [Dialog](https://mui.com/material-ui/api/dialog/) component
  * rather than directly using Modal.
