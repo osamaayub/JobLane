@@ -7,18 +7,20 @@ const cloudinary = require('cloudinary').v2;
 
 
 exports.register = async (req, res) => {
+
     try {
         const { name, email, password, skills } = req.body;
-
-
+          
+        const avatarFile = req.files.avatar[0].path;
+        const resumeFile = req.files.resume[0].path;
         // Upload avatar to Cloudinary
-        const avatarUpload = await cloudinary.uploader.upload(avatar, {
+        const avatarUpload = await cloudinary.uploader.upload(avatarFile, {
             folder: 'avatar',
             crop:'scale'
         });
 
         // Upload resume to Cloudinary (use resource_type: 'raw' for PDFs)
-        const resumeUpload = await cloudinary.uploader.upload(resume, {
+        const resumeUpload = await cloudinary.uploader.upload(resumeFile, {
             folder: 'resume',
         });
 
@@ -172,132 +174,150 @@ exports.me = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
     try {
-
         const { oldPassword, newPassword, confirmPassword } = req.body;
 
-        const user = await User.findById(req.user._id)
+        // Fetch the user based on ID from the request
+        const user = await User.findById(req.user._id);
 
+        // Retrieve the stored hashed password
         const userPassword = user.password;
 
-        const isMatch = comparePassword(oldPassword, userPassword);
-
+        // Check if the provided old password matches the stored password
+        const isMatch = await comparePassword(oldPassword, userPassword);
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
-                message: "Old password is wrong"
-            })
+                message: "Old password is incorrect",
+            });
         }
 
+        // Check if the new password is the same as the old password
         if (newPassword === oldPassword) {
             return res.status(400).json({
                 success: false,
-                message: "New password is same as old Password"
-            })
+                message: "New password cannot be the same as the old password",
+            });
         }
 
+        // Ensure newPassword and confirmPassword match
         if (newPassword !== confirmPassword) {
-            return res.status(401).json({
+            return res.status(400).json({
                 success: false,
-                message: "New Pasword and Confirm Password are not matching"
-            })
+                message: "New password and confirm password do not match",
+            });
         }
 
-        const hashPass =hashPassword(newPassword);
+        // Hash the new password
+        const hashPass = await hashPassword(newPassword, 10);
 
+        // Update the user's password and save
         user.password = hashPass;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "User password changed successfully",
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+exports.updateProfile = async (req, res) => {
+    try {
+        const { newName, newEmail, newSkills } = req.body;
+
+        // Validate required fields
+        if (!newName || !newEmail || !newSkills) {
+            return res.status(400).json({
+                success: false,
+                message: "Name, Email, and Skills are required"
+            });
+        }
+
+        // Validate and access uploaded files
+        const avatarFile = req.files.newAvatar[0].path;
+        const resumeFile = req.files.newResume[0].path;
+
+        // Upload files to Cloudinary if they exist
+        let avatarUpload, resumeUpload;
+
+        if (avatarFile) {
+            avatarUpload = await cloudinary.uploader.upload(avatarFile, {
+                folder: 'avatar',
+                crop: "scale"
+            });
+        }
+
+        if (resumeFile) {
+            resumeUpload = await cloudinary.uploader.upload(resumeFile, {
+                folder: 'resume',
+                crop: "fit"
+            });
+        }
+
+        // Find user and update profile
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        user.name = newName;
+        user.email = newEmail;
+        user.skills = JSON.parse(newSkills);
+
+        if (avatarUpload) {
+            user.avatar = {
+                public_id: avatarUpload.public_id,
+                url: avatarUpload.secure_url
+            };
+        }
+
+        if (resumeUpload) {
+            user.resume = {
+                public_id: resumeUpload.public_id,
+                url: resumeUpload.secure_url
+            };
+        }
 
         await user.save();
 
         res.status(200).json({
             success: true,
-            message: "User password changed"
-        })
-
-
-
+            message: "Profile updated successfully"
+        });
     } catch (err) {
+        console.error("Error updating profile:", err.message);
         res.status(500).json({
             success: false,
-            message: err.message
-        })
+            message: "Internal server error. Please try again later."
+        });
     }
-}
-
-exports.updateProfile = async (req, res) => {
-    try {
-        const { newName, newEmail, newAvatar, newResume, newSkills } = req.body;
-        //if any fields missing dont update profile
-        if (!newName || !newEmail || !newAvatar || !newResume || !newSkills) {
-            return res.status(400).json({
-                sucess: false,
-                message: "All fields are required"
-            })
-        }
-
-        const user = await User.findById(req.user._id);
-
-        if (!user) {
-            return res.status(400).json({
-                sucess: false,
-                message: "user not found"
-            })
-        }
-
-        const avatarId = user.avatar.public_id;
-        const resumeId = user.resume.public_id;
-
-        await cloudinary.uploader.destroy(avatarId);
-        await cloudinary.uploader.destroy(resumeId);
+};
 
 
-        const myCloud1 = await cloudinary.uploader.upload(newAvatar, {
-            folder: 'avatar',
-            crop: "scale",
-        })
 
-        const myCloud2 = await cloudinary.uploader.upload(newResume, {
-            folder: 'resume',
-            crop: "fit",
-        })
-        user.name = newName
-        user.email = newEmail
-        user.skills = newSkills
-        user.avatar = {
-            public_id: myCloud1.public_id,
-            url: myCloud1.secure_url
-        }
-        user.resume = {
-            public_id: myCloud2.public_id,
-            url: myCloud2.secure_url
-        }
-
-        await user.save()
-
-
-        res.status(200).json({
-            success: true,
-            message: "Profile Updated",
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        })
-    }
-}
 
 
 exports.deleteAccount = async (req, res) => {
     try {
 
-        const user = await User.findById(req.user._id)
+        const user = await User.findById(req.user._id);
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        const isMatch = await comparePassword(req.body.password, user.password);
 
-        if (isMatch) {
-            await User.findByIdAndRemove(req.user._id);
+        
+
+        if (!isMatch) {
+           await User.findByIdAndDelete(req.user._id);
         } else {
-            return res.status(200).json({
+            return res.status(400).json({
                 success: false,
                 message: "Password does not match !"
 

@@ -32,7 +32,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 5000
 
 // CORS Configuration
 app.use(cors({
-    origin:"*",
+    origin:[process.env.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
