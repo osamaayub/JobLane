@@ -27,7 +27,7 @@ const JobCard = ({ job }) => {
         >
             <div className='flex gap-5 relative'>
                 <div className='flex justify-center items-center'>
-                    <img src={job.companyLogo.url} className='w-[4rem]' alt="Company Logo" />
+                    <img src={job.companyLogo?.url} className='w-[4rem]' alt="Company Logo" />
                 </div>
 
                 <div className='flex flex-col   w-full md:w-3/4 lg:w-1/2 p-2  rounded'>

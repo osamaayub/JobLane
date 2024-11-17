@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { MetaData } from '../../components/MetaData'
 import { useParams } from 'react-router'
@@ -66,7 +67,7 @@ const EditJobAdmin = () => {
 
     useEffect(() => {
         dispatch(getJobData(id))
-    }, [dispatch, id])
+    }, [id])
 
 
 
@@ -134,8 +135,8 @@ const EditJobAdmin = () => {
 
 
                                 <form onSubmit={postEditHandler} 
-                                 className=' md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8' 
-                                 >
+                                encType='multi-part/form-data'
+                                className=' md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8' action="">
                                     <div className='flex flex-col w-full justify-start items-start pt-4 gap-3'>
                                         <div className='text-4xl pb-1 font-medium border-b border-gray-500 w-full'>
                                             Edit Job Details
@@ -159,8 +160,7 @@ const EditJobAdmin = () => {
                                                     <BiBuilding size={20} />
                                                 </div>
                                                 <input
-                                                    value={companyName} 
-                                                    onChange={(e) => setCompanyName(e.target.value)}
+                                                    value={companyName} onChange={(e) => setCompanyName(e.target.value)}
                                                     required placeholder='Company Name' type="text" className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
                                             </div>
 
@@ -256,13 +256,8 @@ const EditJobAdmin = () => {
                                             <div className='bg-white flex justify-center items-center'>
 
 
-                                                <select
-                                                    required
-                                                    onChange={(e) => setCategory(e.target.value)}
-                                                    value={category}
-                                                    name="category"
-                                                    id="large"
-                                                    className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
+                                                <select required onChange={(e) => setCategory(e.target.value)}
+                                                    value={category} name="" id="large" className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
                                                     <option value="category">Select Category</option>
                                                     <option value="Technology">Technology</option>
                                                     <option value="Marketing">Marketing</option>
@@ -277,13 +272,7 @@ const EditJobAdmin = () => {
                                             <div className='bg-white flex justify-center items-center'>
 
 
-                                                <select 
-                                                required
-                                                    onChange={(e) => setEmploymentType(e.target.value)}
-                                                    value={employmentType}
-                                                    name="employmentType"
-                                                    id="large"
-                                                    className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
+                                                <select required onChange={(e) => setEmploymentType(e.target.value)} value={employmentType} name="" id="large" className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
                                                     <option selected value="">Select Employment Type</option>
                                                     <option value="full-time">Full-time</option>
                                                     <option value="part-time">Part-time</option>
@@ -314,7 +303,7 @@ const EditJobAdmin = () => {
 
 
 
-                                <form onSubmit={postEditHandler} className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8'>
+                                <form onSubmit={postEditHandler} className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8' action="">
 
                                     <div className='md:px-10 px-2 pt-4 pb-20 w-full flex flex-col gap-4'>
                                         <div className='text-center border-gray-500 border-b'>
@@ -327,12 +316,8 @@ const EditJobAdmin = () => {
                                                 <MdOutlineWorkOutline size={20} />
                                             </div>
                                             <input
-                                                value={title}
-                                                onChange={(e) => setTitle(e.target.value)}
-                                                required
-                                                placeholder='Job Title'
-                                                type="text"
-                                                className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
+                                                value={title} onChange={(e) => setTitle(e.target.value)}
+                                                required placeholder='Job Title' type="text" className='outline-none bold-placeholder w-full text-black px-1 pr-3 py-2' />
                                         </div>
 
 

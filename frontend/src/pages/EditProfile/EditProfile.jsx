@@ -21,16 +21,32 @@ const EditProfile = () => {
     const [resumeName, setResumeName] = useState("");
 
     const avatarChange = (e) => {
-        if (e.target.name === "avatar") {
-            setAvatar(e.target.files[0]);
-            setAvatarName(e.target.files[0].name);
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                    setAvatar(reader.result);
+                    setAvatarName(file.name);
+                    setValue('avatar', file);
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 
     const resumeChange = (e) => {
-        if (e.target.name === "resume") {
-            setResume(e.target.files[0]);
-            setResumeName(e.target.files[0].name);
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                    setResume(reader.result);
+                    setResumeName(file.name);
+                    setValue('resume', file);
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -46,14 +62,8 @@ const EditProfile = () => {
         formData.append("newName", name);
         formData.append("newEmail", email);
         formData.append("newSkills", JSON.stringify(skillArr));
-
-        if (avatar) {
-            formData.append("newAvatar", avatar);
-        }
-
-        if (resume) {
-            formData.append("newResume", resume);
-        }
+        formData.append("newAvatar", avatar);
+        formData.append("newResume", resume);
         dispatch(updateProfile(formData));
     };
 

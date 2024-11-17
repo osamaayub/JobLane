@@ -8,7 +8,7 @@ export const createJobPost = createAsyncThunk(
     async (jobData, { rejectWithValue }) => {
         try {
             const config = {
-                headers: {
+                headers: { 
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`,
                 },
             };
