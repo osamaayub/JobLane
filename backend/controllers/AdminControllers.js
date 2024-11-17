@@ -1,12 +1,12 @@
 
 const Job = require('../models/JobModel')
 const User = require('../models/UserModel')
-const Application = require('../models/AppModel')
-const cloudinary = require('cloudinary')
+const Application = require("../models/AppModel")
+const cloudinary = require('cloudinary').v2;
 
 
 // Get all jobs
-exports.getAllJobs = async (req, res) => {
+const getAllJobs = async (req, res) => {
     try {
         const jobs = await Job.find();
 
@@ -24,7 +24,7 @@ exports.getAllJobs = async (req, res) => {
 }
 
 // Get all Users
-exports.getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const users = await User.find();
 
@@ -42,7 +42,7 @@ exports.getAllUsers = async (req, res) => {
 }
 
 // Get all applications
-exports.getAllApp = async (req, res) => {
+const getAllApp = async (req, res) => {
     try {
         const applications = await Application.find().populate("job applicant");
 
@@ -60,7 +60,7 @@ exports.getAllApp = async (req, res) => {
 }
 
 // Update Application Status
-exports.updateApplication = async (req, res) => {
+const updateApplication = async (req, res) => {
     try {
 
         const application = await Application.findById(req.params.id);
@@ -82,7 +82,7 @@ exports.updateApplication = async (req, res) => {
     }
 }
 // Delete Application
-exports.deleteApplication = async (req, res) => {
+const deleteApplication = async (req, res) => {
     try {
 
         const application = await Application.findByIdAndRemove(req.params.id);
@@ -100,7 +100,7 @@ exports.deleteApplication = async (req, res) => {
     }
 }
 // Get Application
-exports.getApplication = async (req, res) => {
+const getApplication = async (req, res) => {
     try {
         const application = await Application.findById(req.params.id).populate("job applicant");
 
@@ -119,7 +119,7 @@ exports.getApplication = async (req, res) => {
 
 
 // Update User Role
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
 
@@ -141,7 +141,7 @@ exports.updateUser = async (req, res) => {
 }
 
 // Delete User
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndRemove(req.params.id);
 
@@ -159,7 +159,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 // Get User
-exports.getUser = async (req, res) => {
+const getUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
 
@@ -178,47 +178,66 @@ exports.getUser = async (req, res) => {
 
 
 // Update Job
-exports.updateJob = async (req, res) => {
+
+const updateJob = async (req, res) => {
     try {
+        // Log the request body and uploaded file for debugging
+        console.log(req.body); // Logs the form data (e.g., title, description, etc.)
+        console.log(req.file); // Logs the uploaded logo file
 
+        // Find the job by ID
         const job = await Job.findById(req.params.id);
-
-        const logoToDelete_Id = job.companyLogo.public_id;
-
-        await cloudinary.v2.uploader.destroy(logoToDelete_Id);
-
-        const logo = req.body.companyLogo;
-
-        const myCloud = await cloudinary.v2.uploader.upload(logo, {
-            folder: 'logo',
-            crop: "scale",
-        })
-
-        req.body.companyLogo = {
-            public_id: myCloud.public_id,
-            url: myCloud.secure_url
+        if (!job) {
+            return res.status(404).json({
+                success: false,
+                message: "Job not found",
+            });
         }
 
-        const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        // Handle new logo upload if a file is uploaded
+        let newLogo = null; // Default to no new logo
+        if (req.file && req.file.path) {
+            // The logo file uploaded via multer is in req.file
+            const logoFile = req.file.path; // Get the file path from multer
+            const myCloud = await cloudinary.uploader.upload(logoFile, {
+                folder: 'logo', // Specify the folder in Cloudinary
+                crop: "scale",  // Scale the image
+            });
 
+            // Set the new logo data with Cloudinary's response
+            newLogo = {
+                public_id: myCloud.public_id,
+                url: myCloud.secure_url,
+            };
+        }
 
+        // Prepare the updated job data (use the form fields and the new logo)
+        const updatedJobData = {
+            ...req.body, // Other fields from the request body (e.g., title, location)
+            companyLogo: newLogo || job.companyLogo, // Use the new logo if uploaded, otherwise retain the old logo
+        };
+
+        // Update the job in the database
+        const updatedJob = await Job.findByIdAndUpdate(req.params.id, updatedJobData, { new: true });
 
         res.status(200).json({
             success: true,
-            message: "Job Updated"
-        })
+            message: "Job Updated",
+            job: updatedJob,
+        });
 
     } catch (err) {
         res.status(500).json({
             success: false,
-            message: err.message
-        })
+            message: err.message,
+        });
     }
-}
+};
+
 
 
 // Get Single Job
-exports.getJob = async (req, res) => {
+const getJob = async (req, res) => {
     try {
 
         const job = await Job.findById(req.params.id)
@@ -238,7 +257,7 @@ exports.getJob = async (req, res) => {
 
 
 // Delete Single Job
-exports.deleteJob = async (req, res) => {
+const deleteJob = async (req, res) => {
     try {
 
         const job = await Job.findByIdAndRemove(req.params.id)
@@ -254,4 +273,19 @@ exports.deleteJob = async (req, res) => {
             message: err.message
         })
     }
+}
+
+module.exports={
+    getAllApp,
+    getAllJobs,
+    getAllUsers,
+    updateApplication,
+    deleteApplication,
+    getApplication,
+    getJob,
+    getUser,
+    updateJob,
+    updateUser,
+    deleteJob,
+    deleteUser
 }

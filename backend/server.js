@@ -1,5 +1,5 @@
 // Import Routes
-const User = require('./routes/UserRoutes');
+const User = require("./routes/UserRoutes");
 const Job = require('./routes/JobRoutes');
 const Application = require('./routes/ApplicationRoutes');
 const Admin = require('./routes/AdminRoutes');
@@ -30,9 +30,10 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
+
 // CORS Configuration
 app.use(cors({
-    origin:[process.env.FRONTEND_URL],
+    origin: [process.env.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
@@ -58,5 +59,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-

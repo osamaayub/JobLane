@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/UserModel')
 
 
-exports.createToken = (id, email) => {
+const createToken = (id, email) => {
     const token = jwt.sign(
         {
             id, email
@@ -18,7 +18,7 @@ exports.createToken = (id, email) => {
 
 
 
-exports.isAuthenticated = async (req, res, next) => {
+const isAuthenticated = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1]
         if (!token) {
@@ -52,7 +52,7 @@ exports.isAuthenticated = async (req, res, next) => {
 
 
 
-exports.authorizationRoles = (...roles) => {
+const authorizationRoles = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role) || req.roles === "admin") {
             return res.status(403).json({
@@ -64,3 +64,8 @@ exports.authorizationRoles = (...roles) => {
         next();
     };
 };
+module.exports={
+    createToken,
+    authorizationRoles,
+    isAuthenticated
+}

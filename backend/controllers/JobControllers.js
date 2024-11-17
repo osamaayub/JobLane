@@ -1,59 +1,57 @@
 const Job = require('../models/JobModel')
 const User = require('../models/UserModel')
-const cloudinary = require('cloudinary')
-const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+
+
 
 
 exports.createJob = async (req, res) => {
     try {
-        const { title, description, companyName, location, logo, skillsRequired, experience, salary, category, employmentType } = req.body;
+        // Extract the fields from req.body
+        const { title, description, companyName, location, experience, salary, category, employmentType, skillsRequired } = req.body;
 
-        // Check if all required fields are present
-        if (!title || !description || !companyName || !location || !logo || !skillsRequired || !experience || !salary || !category || !employmentType) {
-            return res.status(400).json({
-                success: false,
-                message: "All fields are required"
-            });
-        }
-        // Upload logo to Cloudinary
-        const myCloud = await cloudinary.v2.uploader.upload(logo, {
+        // If logo is uploaded, handle it
+        
+        const companyLogo= req.file ;
+
+        // Upload the logo to Cloudinary
+        const myCloud = await cloudinary.uploader.upload(companyLogo, {
             folder: 'logo',
             crop: "scale",
         });
 
-
-        // Create the job in the database
-        const newJob = await Job.create({
+        // Create the new job post in the database
+        const newJob = new Job({
             title,
             description,
             companyName,
+            location,
             companyLogo: {
                 public_id: myCloud.public_id,
                 url: myCloud.secure_url
             },
-            location,
             skillsRequired,
             experience,
-            category,
             salary,
-            employmentType,
-            postedBy: req.user._id
+            category,
+            employmentType
         });
 
-        res.status(201).json({
-            success: true,
-            newJob,
-            message: "Job created successfully"
-        });
+        // Save the job post to the database
+        await newJob.save();
 
-    } catch (err) {
-        console.error("Error:", err.message);
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
+        // Return a success response
+        res.status(201)
+        .json({ message: "Job created successfully", job: newJob });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while creating the job post", error: error.message });
     }
 };
+
+
+
+
 
 
 

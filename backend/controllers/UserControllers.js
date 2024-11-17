@@ -237,7 +237,6 @@ exports.updateProfile = async (req, res) => {
                 message: "Name, Email, and Skills are required"
             });
         }
-
         // Validate and access uploaded files
         const avatarFile = req.files.newAvatar[0].path;
         const resumeFile = req.files.newResume[0].path;
