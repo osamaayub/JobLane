@@ -5,23 +5,25 @@ const cloudinary = require('cloudinary').v2;
 
 
 
-exports.createJob = async (req, res) => {
+const createJob = async (req, res) => {
     try {
         // Extract the fields from req.body
+        console.log(req.body);
         const { title, description, companyName, location, experience, salary, category, employmentType, skillsRequired } = req.body;
-
-        // If logo is uploaded, handle it
         
-        const companyLogo= req.file ;
+         if(!req.file){
+            return res.status(400).json({message:"Logo not Found"});
+         }
+         const logoPath=req.file.path;
 
         // Upload the logo to Cloudinary
-        const myCloud = await cloudinary.uploader.upload(companyLogo, {
+        const myCloud = await cloudinary.uploader.upload(logoPath, {
             folder: 'logo',
             crop: "scale",
         });
 
         // Create the new job post in the database
-        const newJob = new Job({
+        const newJob = Job.create({
             title,
             description,
             companyName,
@@ -55,7 +57,7 @@ exports.createJob = async (req, res) => {
 
 
 
-exports.allJobs = async (req, res) => {
+const allJobs = async (req, res) => {
     try {
 
         const Jobs = await Job.find();
@@ -74,7 +76,7 @@ exports.allJobs = async (req, res) => {
 }
 
 
-exports.oneJob = async (req, res) => {
+const oneJob = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id).populate('postedBy');
 
@@ -92,7 +94,7 @@ exports.oneJob = async (req, res) => {
 }
 
 
-exports.saveJob = async (req, res) => {
+const saveJob = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id);
@@ -130,7 +132,7 @@ exports.saveJob = async (req, res) => {
     }
 }
 
-exports.getSavedJobs = async (req, res) => {
+const getSavedJobs = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id).populate('savedJobs');;
@@ -150,4 +152,12 @@ exports.getSavedJobs = async (req, res) => {
             message: err.message
         })
     }
+}
+
+module.exports={
+createJob,
+getSavedJobs,
+saveJob,
+oneJob,
+allJobs
 }
