@@ -1,5 +1,5 @@
 const express = require('express')
-const upload=require("../utils/multer");
+const upload = require('../utils/multer');
 const { isAuthenticated, authorizationRoles } = require('../middlewares/auth')
 const {
   createJob,
@@ -11,8 +11,9 @@ const {
 const router = express.Router()
 
 
-router.route("/create/job").post(
-  isAuthenticated, authorizationRoles("admin"),upload.single('companyLogo'),  createJob)
+router.route("/create/job")
+.post(isAuthenticated, authorizationRoles("admin"),
+upload.single('companyLogo'),  createJob)
 
 router.route("/jobs").get(allJobs) ;
 

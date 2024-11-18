@@ -36,7 +36,6 @@ const createJob = async (req, res) => {
             category,
             employmentType
         });
-        console.log(newJob);
 
         // Return a success response
         res.status(201)

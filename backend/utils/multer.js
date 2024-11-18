@@ -30,13 +30,12 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|pdf/;
     const mimeTypeValid = allowedTypes.test(file.mimetype);
     const extnameValid = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-
     // Check file type and extension
     if (mimeTypeValid && extnameValid) {
       return cb(null, true); // Proceed with the upload
     }
     // Return error if file type is not allowed
-    cb(new Error('Invalid file type. Only .jpeg, .jpg, .png, and .pdf formats are allowed.'));
+    cb(new Error(`Invalid file type: ${file.mimetype}. Allowed formats: .jpeg, .jpg, .png, .pdf`));
   }
 });
 

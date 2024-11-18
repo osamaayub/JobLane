@@ -182,7 +182,6 @@ const getUser = async (req, res) => {
 const updateJob = async (req, res) => {
     try {
         // Log the request body and uploaded file for debugging
-        console.log(req.body); // Logs the form data (e.g., title, description, etc.)
         console.log(req.file); // Logs the uploaded logo file
 
         // Find the job by ID
@@ -195,7 +194,6 @@ const updateJob = async (req, res) => {
         }
 
         // Handle new logo upload if a file is uploaded
-        let newLogo = null; // Default to no new logo
         if (req.file && req.file.path) {
             // The logo file uploaded via multer is in req.file
             const logoFile = req.file.path; // Get the file path from multer
@@ -205,20 +203,15 @@ const updateJob = async (req, res) => {
             });
 
             // Set the new logo data with Cloudinary's response
-            newLogo = {
+            companyLogo = {
                 public_id: myCloud.public_id,
                 url: myCloud.secure_url,
             };
         }
 
-        // Prepare the updated job data (use the form fields and the new logo)
-        const updatedJobData = {
-            ...req.body, // Other fields from the request body (e.g., title, location)
-            companyLogo: newLogo || job.companyLogo, // Use the new logo if uploaded, otherwise retain the old logo
-        };
-
         // Update the job in the database
-        const updatedJob = await Job.findByIdAndUpdate(req.params.id, updatedJobData, { new: true });
+        const updatedJob = await Job.findByIdAndUpdate(req.params.id, 
+            updatedJobData, { new: true });
 
         res.status(200).json({
             success: true,
