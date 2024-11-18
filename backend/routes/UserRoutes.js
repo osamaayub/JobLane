@@ -6,7 +6,8 @@ const {
   me,
   changePassword,
   updateProfile,
-  deleteAccount } = require('../controllers/UserControllers')
+  deleteAccount 
+} = require('../controllers/UserControllers')
 const upload = require("../utils/multer");
 const { isAuthenticated } = require('../middlewares/auth');
 const router = express.Router()
