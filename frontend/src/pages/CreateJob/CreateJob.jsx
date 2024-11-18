@@ -77,7 +77,6 @@ const CreateJob = () => {
     formData.append("companyLogo",logo.files[0]);
     formData.append("employmentType", employmentType);
     formData.append("skillsRequired", JSON.stringify(skillsArr));
-    console.log(logo);
     // Dispatch the action with formData
     dispatch(createJobPost(formData));
 
