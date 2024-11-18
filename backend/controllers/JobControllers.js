@@ -1,5 +1,6 @@
 const Job = require('../models/JobModel')
 const User = require('../models/UserModel')
+const mongoose=require("mongoose");
 const cloudinary = require('cloudinary').v2;
 
 
@@ -8,29 +9,26 @@ const cloudinary = require('cloudinary').v2;
 const createJob = async (req, res) => {
     try {
         // Extract the fields from req.body
-        console.log(req.body);
+
         const { title, description, companyName, location, experience, salary, category, employmentType, skillsRequired } = req.body;
-        
-         if(!req.file){
-            return res.status(400).json({message:"Logo not Found"});
-         }
+
          const logoPath=req.file.path;
 
         // Upload the logo to Cloudinary
-        const myCloud = await cloudinary.uploader.upload(logoPath, {
+        const jobCloud = await cloudinary.uploader.upload(logoPath, {
             folder: 'logo',
             crop: "scale",
         });
 
         // Create the new job post in the database
-        const newJob = Job.create({
+        const newJob = await Job.create({
             title,
             description,
             companyName,
             location,
             companyLogo: {
-                public_id: myCloud.public_id,
-                url: myCloud.secure_url
+                public_id: jobCloud.public_id,
+                url: jobCloud.secure_url
             },
             skillsRequired,
             experience,
@@ -38,13 +36,15 @@ const createJob = async (req, res) => {
             category,
             employmentType
         });
-
-        // Save the job post to the database
-        await newJob.save();
+        console.log(newJob);
 
         // Return a success response
         res.status(201)
-        .json({ message: "Job created successfully", job: newJob });
+        .json({
+            sucess:true,
+            message:"Job Created Sucessfully",
+            newJob
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "An error occurred while creating the job post", error: error.message });
