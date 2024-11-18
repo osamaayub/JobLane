@@ -73,7 +73,7 @@ const JobDetails = () => {
             <div>
               <div className='flex pt-5 md:px-12 pl-4 md:gap-10 gap-5'>
                 <div className='flex  items-center w-[6rem]'>
-                  <img src={jobDetails && jobDetails.companyLogo?.url} className='md:h-32 h-24 w-24 md:w-32' alt="" />
+                  <img src={jobDetails && jobDetails.companyLogo.url} className='md:h-32 h-24 w-24 md:w-32' alt="" />
                 </div>
                 <div className='flex flex-col gap-2 md:pt-2'>
                   <p className='text-xl flex gap-1 items-center  md:text-3xl'><BiBriefcase /> {jobDetails.title}</p>

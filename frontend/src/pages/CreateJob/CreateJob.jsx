@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { MetaData } from '../../components/MetaData'
 import Sidebar from '../../components/Sidebar'
-import { 
-  MdOutlineLocationOn, 
-  MdOutlineFeaturedPlayList, 
-  MdOutlineWorkOutline, 
-  MdWorkspacesOutline, 
-  MdAttachMoney, 
-  MdOutlineReceiptLong } from 'react-icons/md'
+import {
+  MdOutlineLocationOn,
+  MdOutlineFeaturedPlayList,
+  MdOutlineWorkOutline,
+  MdWorkspacesOutline,
+  MdAttachMoney,
+  MdOutlineReceiptLong
+} from 'react-icons/md'
 import { BiImageAlt } from 'react-icons/bi'
 import { TbLoader2 } from 'react-icons/tb'
 import { BiBuilding } from 'react-icons/bi'
@@ -45,20 +46,15 @@ const CreateJob = () => {
 
 
 
-
+//for logo 
   const logoChange = (e) => {
-    if (e.target.name === "logo") {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setLogo(reader.result);
-          setLogoName(e.target.files[0].name)
-        }
-      };
-
-      reader.readAsDataURL(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogo(file); // Store the file object in the state
+      setLogoName(file.name);
     }
-  }
+  };
+
 
 
 
@@ -78,16 +74,10 @@ const CreateJob = () => {
     formData.append("experience", experience);
     formData.append("salary", salary);
     formData.append("category", category);
+    formData.append("companyLogo",logo.files[0]);
     formData.append("employmentType", employmentType);
-
-    // Convert skills array to a comma-separated string and append
-    formData.append("skillsRequired", skillsArr.join(","));
-
-    // Append the logo file separately
-    if (logo) {
-      formData.append("companyLogo", logo);
-    }
-
+    formData.append("skillsRequired", JSON.stringify(skillsArr));
+    console.log(logo);
     // Dispatch the action with formData
     dispatch(createJobPost(formData));
 
@@ -104,9 +94,6 @@ const CreateJob = () => {
     setLogo("");
     setLogoName("");
   }
-
-
-
   return (
     <>
 
@@ -126,11 +113,9 @@ const CreateJob = () => {
         <div className=' flex justify-center w-full items-start pt-6'>
 
 
-          <form onSubmit={postHandler} 
-          className='md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8' 
-           method='POST'
-           encType='multi-part/form-data'
-           >
+          <form onSubmit={postHandler} encType="multipart/form-data"
+            className='md:flex hidden  shadow-gray-700  w-full md:mx-0 mx-8'
+          >
             <div className='flex flex-col w-full justify-start items-start pt-4 gap-3'>
               <div className='text-4xl pb-1 font-medium border-b border-gray-500 w-full'>
                 Post Job
@@ -250,11 +235,11 @@ const CreateJob = () => {
                 <div className='bg-white flex justify-center items-center'>
 
 
-                  <select required 
-                  onChange={(e) => setCategory(e.target.value)} 
-                  value={category} 
-                   id="large" 
-                   className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
+                  <select required
+                    onChange={(e) => setCategory(e.target.value)}
+                    value={category}
+                    id="large"
+                    className="block w-full px-6 py-2 text-base text-gray-900 border border-gray-300  bg-gray-50 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 ">
                     <option value="">Select Category</option>
                     <option value="Technology">Technology</option>
                     <option value="Marketing">Marketing</option>
@@ -296,11 +281,9 @@ const CreateJob = () => {
             </div>
 
           </form>
-
-
-
-
-          <form onSubmit={postHandler} className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8' action="">
+          <form onSubmit={postHandler} 
+          encType='multi-part/form-data'
+          className=' md:hidden flex md:w-1/3 shadow-gray-700  w-full md:mx-0 mx-8' action="">
 
             <div className='md:px-10 px-2 pt-4 pb-20 w-full flex flex-col gap-4'>
               <div className='text-center border-gray-500 border-b'>
