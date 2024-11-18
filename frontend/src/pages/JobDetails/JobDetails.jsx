@@ -73,7 +73,8 @@ const JobDetails = () => {
             <div>
               <div className='flex pt-5 md:px-12 pl-4 md:gap-10 gap-5'>
                 <div className='flex  items-center w-[6rem]'>
-                  <img src={jobDetails && jobDetails.companyLogo.url} className='md:h-32 h-24 w-24 md:w-32' alt="" />
+                  <img src={jobDetails && jobDetails.companyLogo.url} className='md:h-32 h-10 w-24 md:w-32 rounded'
+                   alt="company Logo" />
                 </div>
                 <div className='flex flex-col gap-2 md:pt-2'>
                   <p className='text-xl flex gap-1 items-center  md:text-3xl'><BiBriefcase /> {jobDetails.title}</p>
@@ -102,7 +103,7 @@ const JobDetails = () => {
                     <li className='flex items-center gap-3'>Salary: <div className='flex items-center' ><BiRupee /> <span>{(jobDetails.salary / 10).toFixed(0)} $</span></div></li>
                     <li className='flex items-center gap-3'>Experience: <div> {jobDetails.experience}</div></li>
                     <li className='flex items-center gap-3'>Skills Required: <div className='flex flex-wrap items-center gap-3'> {jobDetails.skillsRequired.map((e, i) => (<span key={i} className='px-2 py-0.5 bg-yellow-600 rounded text-black md:text-sm font-semibold text-xs'>
-                      {e.split(',')}
+                      {e}
                       </span>))}                     </div></li>
                     <li className='grid gird-cols-1 gap-2 pt-2'><div className='text-2xl'>Job Description: </div> <div> {jobDetails.description}</div></li>
                   </ul>

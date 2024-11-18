@@ -18,45 +18,30 @@ const EditProfile = () => {
     const [avatar, setAvatar] = useState("");
     const [avatarName, setAvatarName] = useState("");
     const [resume, setResume] = useState("");
+    const [Value,setValue]=useState("");
     const [resumeName, setResumeName] = useState("");
 
     const avatarChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.readyState === 2) {
-                    setAvatar(reader.result);
-                    setAvatarName(file.name);
-                    setValue('avatar', file);
-                }
-            };
-            reader.readAsDataURL(file);
+            setAvatar(file); // Set the raw file object
+            setAvatarName(file.name); // Set file name for display
+            setValue('avatar', file); // Use for form handling if needed
         }
     };
-
     const resumeChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.readyState === 2) {
-                    setResume(reader.result);
-                    setResumeName(file.name);
-                    setValue('resume', file);
-                }
-            };
-            reader.readAsDataURL(file);
+            setResume(file); // Set the raw file object
+            setResumeName(file.name); // Set file name for display
+            setValue('resume', file); // Use for form handling if needed
         }
     };
 
 
     const editHandler = (e) => {
         e.preventDefault();
-        let skillArr = skills;
-        if (skills.constructor !== Array) {
-            skillArr = skills.split(",");
-        }
+        const skillsArr = skillsRequired.split(",");
 
         const formData = new FormData();
         formData.append("newName", name);

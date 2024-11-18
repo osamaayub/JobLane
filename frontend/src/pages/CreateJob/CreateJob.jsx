@@ -60,8 +60,8 @@ const CreateJob = () => {
 
   const postHandler = (e) => {
     e.preventDefault();
-
     const skillsArr = skillsRequired.split(",");
+
 
     // Create FormData instance
     const formData = new FormData();

@@ -8,11 +8,10 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router';
 
 const ApplicationDetails = () => {
-    const { applicationDetails, loading, error } = useSelector((state) => state.application);
+    const { applicationDetails, loading } = useSelector((state) => state.application);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
-
     
 
     const deleteApplicationHandler = () => {
@@ -24,7 +23,7 @@ const ApplicationDetails = () => {
         if (id) {
             dispatch(getSingleApplication(id));
         }
-    }, [dispatch, id]);
+    },[id]);
 
     const toUpperFirst = (str = "") => str.charAt(0).toUpperCase() + str.slice(1);
 
