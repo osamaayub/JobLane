@@ -181,51 +181,32 @@ const getUser = async (req, res) => {
 
 const updateJob = async (req, res) => {
     try {
-        // Log the request body and uploaded file for debugging
-        console.log(req.file); // Logs the uploaded logo file
-
-        // Find the job by ID
-        const job = await Job.findById(req.params.id);
-        if (!job) {
-            return res.status(404).json({
-                success: false,
-                message: "Job not found",
-            });
+    const job = await Job.findById(req.params.id);
+    const logoToDelete_Id = job.companyLogo.public_id;
+    await cloudinary.uploader.destroy(logoToDelete_Id);
+        const logo = req.body.companyLogo;
+        const myCloud = await cloudinary.v2.uploader.upload(logo, {
+            folder: 'logo',
+            crop: "scale",
+        })
+        req.body.companyLogo = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url
         }
-
-        // Handle new logo upload if a file is uploaded
-        if (req.file && req.file.path) {
-            // The logo file uploaded via multer is in req.file
-            const logoFile = req.file.path; // Get the file path from multer
-            const myCloud = await cloudinary.uploader.upload(logoFile, {
-                folder: 'logo', // Specify the folder in Cloudinary
-                crop: "scale",  // Scale the image
-            });
-
-            // Set the new logo data with Cloudinary's response
-            companyLogo = {
-                public_id: myCloud.public_id,
-                url: myCloud.secure_url,
-            };
-        }
-
-        // Update the job in the database
-        const updatedJob = await Job.findByIdAndUpdate(req.params.id, 
-            updatedJobData, { new: true });
-
-        res.status(200).json({
-            success: true,
-            message: "Job Updated",
-            job: updatedJob,
-        });
+    const jobData = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      res.status(200).json({
+        sucess:true,
+        message:"Job Updated",
+        jobData
+      });
 
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message,
-        });
+     res.status(500).json({
+        sucess:false,
+        message:err.message
+     })
     }
-};
+}
 
 
 
@@ -268,7 +249,7 @@ const deleteJob = async (req, res) => {
     }
 }
 
-module.exports={
+module.exports = {
     getAllApp,
     getAllJobs,
     getAllUsers,

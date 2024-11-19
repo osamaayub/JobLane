@@ -34,7 +34,8 @@ const createJob = async (req, res) => {
             experience,
             salary,
             category,
-            employmentType
+            employmentType,
+            postedBy:req.user._id
         });
 
         // Return a success response

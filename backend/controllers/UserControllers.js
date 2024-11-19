@@ -6,7 +6,7 @@ const cloudinary = require('cloudinary').v2;
 
 
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
 
     try {
         const { name, email, password, skills } = req.body;
@@ -75,7 +75,7 @@ exports.register = async (req, res) => {
 
 //login
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password} = req.body;
         if (!email || !password) {
@@ -122,7 +122,7 @@ exports.login = async (req, res) => {
 }
 
 
-exports.isLogin = async (req, res) => {
+const isLogin = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id);
@@ -147,7 +147,7 @@ exports.isLogin = async (req, res) => {
     }
 }
 
-exports.me = async (req, res) => {
+const me = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id);
@@ -172,7 +172,7 @@ exports.me = async (req, res) => {
     }
 }
 
-exports.changePassword = async (req, res) => {
+const changePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword, confirmPassword } = req.body;
 
@@ -226,10 +226,10 @@ exports.changePassword = async (req, res) => {
         });
     }
 };
-exports.updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
     try {
         const { newName, newEmail, newSkills } = req.body;
-
+           console.log(req.files);
         // Validate required fields
         if (!newName || !newEmail || !newSkills) {
             return res.status(400).json({
@@ -237,59 +237,65 @@ exports.updateProfile = async (req, res) => {
                 message: "Name, Email, and Skills are required"
             });
         }
-        // Validate and access uploaded files
-        const avatarFile = req.files.newAvatar[0].path;
-        const resumeFile = req.files.newResume[0].path;
 
+        // Validate and access uploaded files
+        const newAvatar = req.files && req.files.newAvatar ? req.files.newAvatar[0].path : null;
+        const newResume = req.files && req.files.newResume ? req.files.newResume[0].path : null;
         // Upload files to Cloudinary if they exist
         let avatarUpload, resumeUpload;
 
-        if (avatarFile) {
-            avatarUpload = await cloudinary.uploader.upload(avatarFile, {
+        if (newAvatar) {
+            avatarUpload = await cloudinary.uploader.upload(newAvatar, {
                 folder: 'avatar',
                 crop: "scale"
             });
         }
 
-        if (resumeFile) {
-            resumeUpload = await cloudinary.uploader.upload(resumeFile, {
+        if (newResume) {
+            resumeUpload = await cloudinary.uploader.upload(newResume, {
                 folder: 'resume',
-                crop: "fit"
+                resource_type: "raw"  // For non-image files like PDF
             });
         }
+        if(!req.user._id && req.user){
+            return res.status(400).json({
+                sucess:false,
+                message:"Invalid User Id"
+            })
+        }
 
-        // Find user and update profile
-        const user = await User.findById(req.user._id);
-        if (!user) {
+        // Find user and update profile using findByIdAndUpdate
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    name: newName,
+                    email: newEmail,
+                    skills: JSON.parse(newSkills),
+                    avatar: avatarUpload ? {
+                        public_id: avatarUpload.public_id,
+                        url: avatarUpload.secure_url
+                    } : undefined,
+                    resume: resumeUpload ? {
+                        public_id: resumeUpload.public_id,
+                        url: resumeUpload.secure_url
+                    } : undefined
+                }
+            },
+            { new: true }  // Return the updated user document
+        );
+
+        if (!updatedUser) {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
         }
 
-        user.name = newName;
-        user.email = newEmail;
-        user.skills = JSON.parse(newSkills);
-
-        if (avatarUpload) {
-            user.avatar = {
-                public_id: avatarUpload.public_id,
-                url: avatarUpload.secure_url
-            };
-        }
-
-        if (resumeUpload) {
-            user.resume = {
-                public_id: resumeUpload.public_id,
-                url: resumeUpload.secure_url
-            };
-        }
-
-        await user.save();
-
         res.status(200).json({
             success: true,
-            message: "Profile updated successfully"
+            message: "Profile updated successfully",
+            user: updatedUser
         });
     } catch (err) {
         console.error("Error updating profile:", err.message);
@@ -304,7 +310,8 @@ exports.updateProfile = async (req, res) => {
 
 
 
-exports.deleteAccount = async (req, res) => {
+
+const deleteAccount = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id);
@@ -335,4 +342,13 @@ exports.deleteAccount = async (req, res) => {
             message: err.message
         })
     }
+}
+module.exports={
+    register,
+    login,
+    isLogin,
+    changePassword,
+    deleteAccount,
+    me,
+    updateProfile
 }
