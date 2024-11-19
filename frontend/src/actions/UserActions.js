@@ -114,13 +114,11 @@ export const updateProfile = createAsyncThunk(
         try {
             const config = {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${localStorage.getItem('userToken')}`
                 }
             };
             const response = await axiosRequest.put("/updateProfile", userData, config);
             toast.success("Profile updated successfully !");
-            console.log(userData);
             return response.data;
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
