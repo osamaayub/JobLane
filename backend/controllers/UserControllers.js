@@ -229,7 +229,6 @@ const changePassword = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const { newName, newEmail, newSkills } = req.body;
-           console.log(req.files);
         // Validate required fields
         if (!newName || !newEmail || !newSkills) {
             return res.status(400).json({
@@ -244,23 +243,19 @@ const updateProfile = async (req, res) => {
         // Upload files to Cloudinary if they exist
         let avatarUpload, resumeUpload;
 
-        if (newAvatar) {
+        
             avatarUpload = await cloudinary.uploader.upload(newAvatar, {
                 folder: 'avatar',
                 crop: "scale"
             });
-        }
-
-        if (newResume) {
             resumeUpload = await cloudinary.uploader.upload(newResume, {
                 folder: 'resume',
-                resource_type: "raw"  // For non-image files like PDF
             });
-        }
-        if(!req.user._id && req.user){
+            //check if the user is valid or not
+         if(!req.user._id && req.user){
             return res.status(400).json({
                 sucess:false,
-                message:"Invalid User Id"
+                message:"Invalid UserId"
             })
         }
 
@@ -271,7 +266,7 @@ const updateProfile = async (req, res) => {
                 $set: {
                     name: newName,
                     email: newEmail,
-                    skills: JSON.parse(newSkills),
+                    skills: newSkills,
                     avatar: avatarUpload ? {
                         public_id: avatarUpload.public_id,
                         url: avatarUpload.secure_url
@@ -284,7 +279,7 @@ const updateProfile = async (req, res) => {
             },
             { new: true }  // Return the updated user document
         );
-
+           //if the user does not exists
         if (!updatedUser) {
             return res.status(404).json({
                 success: false,
