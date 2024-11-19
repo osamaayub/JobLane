@@ -55,7 +55,7 @@ const Register = () => {
   };
 
   useEffect(() => {
-    if (!registrationSucess) {
+    if (registrationSucess) {
       navigate('/login');
     }
     if (isLogin) {
@@ -66,32 +66,21 @@ const Register = () => {
   const avatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setAvatar(reader.result);
-          setAvatarName(file.name);
-          setValue('avatar', file);
-        }
-      };
-      reader.readAsDataURL(file);
+      setAvatar(file); // Directly set the raw file
+      setAvatarName(file.name);
+      setValue('avatar', file);
     }
   };
 
   const resumeChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setResume(reader.result);
-          setResumeName(file.name);
-          setValue('resume', file);
-        }
-      };
-      reader.readAsDataURL(file);
+      setResume(file); // Directly set the raw file
+      setResumeName(file.name);
+      setValue('resume', file);
     }
   };
+
 
   return (
     <>
@@ -100,6 +89,7 @@ const Register = () => {
         <form
           onSubmit={handleSubmit(onSubmit)}
           id='form'
+          encType='multi-part/form-data'
           className="flex flex-col w-full sm:w-3/4 md:w-2/3 lg:w-1/3 p-6 bg-gray-800 rounded-lg shadow-lg"
         >
           <div className="text-center pb-6">
