@@ -102,10 +102,10 @@ const UserSlice = createSlice({
             .addCase(logOrNot.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(logOrNot.fulfilled, (state, action) => {
+            .addCase(logOrNot.fulfilled, (state,action) => {
                 state.loading = false;
-                state.isLogin = action.payload;
-            })
+                 state.isLogin=action.payload;
+             })
             .addCase(logOrNot.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Error checking login status";

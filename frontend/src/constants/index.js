@@ -45,10 +45,12 @@ export const companiesData = [
   "Amazon",
   "Oracle",
   "Devsinc",
-  "System Limited"
+  "System Limited",
+  "Uber",
+  "Careem"
 ]
 
-export const data = ["Technology", "Marketing", "Finance", "Sales", "Legal", ""]
+export const data = ["Technology", "Marketing", "Finance", "Sales", "Legal"]
 
 
 export const dataArray = [

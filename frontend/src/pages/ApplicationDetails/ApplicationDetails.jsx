@@ -12,7 +12,6 @@ const ApplicationDetails = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
-    
 
     const deleteApplicationHandler = () => {
         dispatch(deleteApplication(id));
@@ -62,10 +61,10 @@ const ApplicationDetails = () => {
                         <p className="text-2xl pb-2">Job Details:</p>
                         <div>
                             <ul>
-                                <li className="flex gap-4 items-center">Role: <div>{applicationDetails.job?.title || "N/A"}</div></li>
-                                <li className="flex gap-4 items-center">Company: <div>{applicationDetails.job?.companyName || "N/A"}</div></li>
-                                <li className="flex gap-4 items-center">Location: <div>{applicationDetails.job?.location || "N/A"}</div></li>
-                                <li className="flex gap-4 items-center">Experience: <div>{applicationDetails.job?.experience || "N/A"}</div></li>
+                                <li className="flex gap-4 items-center">Role: <div>{applicationDetails.job?.title}</div></li>
+                                <li className="flex gap-4 items-center">Company: <div>{applicationDetails.job?.companyName}</div></li>
+                                <li className="flex gap-4 items-center">Location: <div>{applicationDetails.job?.location}</div></li>
+                                <li className="flex gap-4 items-center">Experience: <div>{applicationDetails.job?.experience}</div></li>
                             </ul>
                         </div>
                     </div>

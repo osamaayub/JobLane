@@ -23,10 +23,11 @@ const Jobs = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const isMobile = useIsMobile();
+  
 
   useEffect(() => {
     dispatch(getAllJobs());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     setJobs(allJobs);

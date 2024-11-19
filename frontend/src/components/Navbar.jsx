@@ -22,14 +22,29 @@ const Navbar = () => {
     const navigate = useNavigate();
     const isMobile = useIsMobile();
 
-    const LogOut = () => {
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('role');
-        dispatch(logOrNot());
-        navigate('/');
-        toast.success("Logout Successful !");
-        dispatch(logoutClearState());
+    const LogOut = async () => {
+        try {
+            // Remove token and role from localStorage
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('role');
+
+            // Dispatch logout action and wait for the result
+            await dispatch(logOrNot());
+
+            // Show success message
+            toast.success("Logout Successful!");
+
+            // Clear the state and navigate
+            dispatch(logoutClearState());
+            navigate('/');
+        } catch (error) {
+            // Handle any errors during the logout process
+            console.error("Logout failed:", error);
+            toast.error(error || "Logout failed. Please try again.");
+        }
     };
+
+
 
     return (
         <div className='text-white min-w-full overflow-x-hidden z-20 bg-gray-950 border-b border-gray-700'>

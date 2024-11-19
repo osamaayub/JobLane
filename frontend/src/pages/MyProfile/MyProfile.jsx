@@ -35,8 +35,8 @@ const MyProfile = () => {
 
 
   // Fallback values if me is not defined
-  const avatarUrl = me?.avatar?.url || '/tmp/to/default-avatar.png';
-  const resumeUrl = me?.resume?.url || '/tmp/to/default-resume.png';
+  const avatarUrl = me.avatar.url || '/tmp/to/default-avatar.png';
+  const resumeUrl = me.resume.url || '/tmp/to/default-resume.png';
 
   return (
     <>
@@ -62,20 +62,20 @@ const MyProfile = () => {
                 <div className='flex flex-col md:gap-5 gap-6'>
                   <div>
                     <p className='md:text-2xl text-xl'>Full Name</p>
-                    <p className='md:text-xl pt-1 text-lg'>{me?.name || 'N/A'}</p>
+                    <p className='md:text-xl pt-1 text-lg'>{me.name || 'N/A'}</p>
                   </div>
                   <div>
                     <p className='md:text-2xl text-xl'>Email</p>
-                    <p className='md:text-xl pt-1 text-lg'>{me?.email || 'N/A'}</p>
+                    <p className='md:text-xl pt-1 text-lg'>{me.email || 'N/A'}</p>
                   </div>
                   <div>
                     <p className='md:text-2xl text-xl'>Joined On</p>
-                    <p className='md:text-xl pt-1 text-lg'>{convertDateFormat(me?.createdAt) || ''}</p>
+                    <p className='md:text-xl pt-1 text-lg'>{convertDateFormat(me.createdAt) || ''}</p>
                   </div>
                   <div>
                     <p className='md:text-2xl text-xl'>Skills</p>
                     <div className='md:text-xl text-lg pt-3 flex gap-3'>
-                      {me?.skills?.length > 0 ? (
+                      {me.skills.length > 0 ? (
                         me.skills.map((skill, i) => (
                           <span key={i} className='bg-yellow-500 text-black text-sm px-2 py-1 font-bold'>{skill}</span>
                         ))
