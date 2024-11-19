@@ -75,7 +75,6 @@ const UserSlice = createSlice({
                 state.registrationSuccess = true;
                 state.isLogin = true;
                 state.me = action.payload.user;
-                state.error = null;
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
