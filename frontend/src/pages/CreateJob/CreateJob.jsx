@@ -43,9 +43,6 @@ const CreateJob = () => {
 
 
 
-
-
-
 //for logo 
   const logoChange = (e) => {
     if (e.target.files && e.target.files[0]) {
