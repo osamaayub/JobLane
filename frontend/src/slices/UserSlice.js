@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { createSlice } from '@reduxjs/toolkit';
-import {toast} from "react-toastify"; 
 import {
     loginUser,
     logOrNot,
@@ -129,7 +128,6 @@ const UserSlice = createSlice({
             })
             .addCase(changePass.fulfilled, (state) => {
                 state.loading = false;
-                toast.success("Password changed successfully!");
             })
             .addCase(changePass.rejected, (state, action) => {
                 state.loading = false;
@@ -143,7 +141,6 @@ const UserSlice = createSlice({
             .addCase(updateProfile.fulfilled, (state, action) => {
                 state.loading = false;
                 state.userDetails = action.payload.user;
-                toast.success("Profile updated successfully!");
             })
             .addCase(updateProfile.rejected, (state, action) => {
                 state.loading = false;
@@ -158,7 +155,6 @@ const UserSlice = createSlice({
                 state.loading = false;
                 state.isLogin = false;
                 localStorage.removeItem('userToken');
-                toast.success("Account deleted successfully!");
             })
             .addCase(deleteAccount.rejected, (state, action) => {
                 state.loading = false;

@@ -23,7 +23,7 @@ const MyProfile = () => {
     } else {
       navigate('/login'); // Redirect to login if not logged in
     }
-  }, [dispatch, isLogin, navigate]);
+  }, [isLogin]);
 
   const convertDateFormat = (inputDate) => {
     const date = new Date(inputDate);

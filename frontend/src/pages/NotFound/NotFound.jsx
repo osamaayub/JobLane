@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-function NotFound() {
+const NotFound=()=> {
     return (
         <main className="flex flex-col md:flex-col xl:flex-row w-100 px-4 py-20 sm:px-6 md:px-8 lg:px-10 bg-black">
             <div className="flex flex-col justify-center items-center px-4 py-20 md:px-8 lg:px-2 text-gray-700 w-full">

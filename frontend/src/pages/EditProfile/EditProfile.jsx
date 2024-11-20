@@ -55,7 +55,7 @@ const EditProfile = () => {
         if (!me) {
             dispatch(ME()); // Dispatch the action to fetch the user data
         }
-    }, [me]);
+    }, []);
 
     // Update local state when `me` is available
     useEffect(() => {

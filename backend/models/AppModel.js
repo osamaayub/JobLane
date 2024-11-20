@@ -4,12 +4,10 @@ const ApplicationSchema =  new mongoose.Schema({
     job: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Job',
-        required: true
     },
     applicant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
     },
     applicantResume: {
         public_id: {
@@ -30,7 +28,7 @@ const ApplicationSchema =  new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+},{timestamps: true})
 
 const Application = mongoose.model('Application', ApplicationSchema) ;
 module.exports = Application

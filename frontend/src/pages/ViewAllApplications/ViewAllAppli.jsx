@@ -16,7 +16,7 @@ const ViewAllAppli = () => {
 
   useEffect(() => {
     dispatch(getAllAppAdmin());
-  }, [dispatch]);
+  }, []);
 
   const convertDateFormat = (inputDate) => {
     const parts = inputDate.split('-');

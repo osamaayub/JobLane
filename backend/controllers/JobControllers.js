@@ -12,7 +12,7 @@ const createJob = async (req, res) => {
 
         const { title, description, companyName, location, experience, salary, category, employmentType, skillsRequired } = req.body;
 
-         const logoPath=req.file.path;
+         const logoPath=req.file ? req.file.path:null;
 
         // Upload the logo to Cloudinary
         const jobCloud = await cloudinary.uploader.upload(logoPath, {

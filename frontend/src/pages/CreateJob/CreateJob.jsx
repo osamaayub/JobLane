@@ -71,7 +71,7 @@ const CreateJob = () => {
     formData.append("experience", experience);
     formData.append("salary", salary);
     formData.append("category", category);
-    formData.append("companyLogo",logo.files[0]);
+    formData.append("companyLogo",logo);
     formData.append("employmentType", employmentType);
     formData.append("skillsRequired", JSON.stringify(skillsArr));
     // Dispatch the action with formData

@@ -29,7 +29,7 @@ const JobDetails = () => {
 
   useEffect(() => {
     dispatch(getSingleJob(id))
-  }, [dispatch])
+  }, [])
 
   const convertDateFormat = (inputDate) => {
     const parts = inputDate.split('-');

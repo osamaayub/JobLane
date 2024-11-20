@@ -8,11 +8,7 @@ export const registerUser = createAsyncThunk(
     'user/register',
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await axiosRequest.post("/register", userData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data' // Ensure the content type is multipart/form-data
-                },
-            });
+            const response = await axiosRequest.post("/register", userData);
             localStorage.setItem('userToken', response.data.token);
             toast.success("Registration successful !");
             return response.data;

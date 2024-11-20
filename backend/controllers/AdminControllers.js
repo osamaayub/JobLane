@@ -161,7 +161,8 @@ const deleteUser = async (req, res) => {
 // Get User
 const getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const {id}=req.params;
+        const user = await User.findById(id);
 
         res.status(200).json({
             success: true,
@@ -185,7 +186,7 @@ const updateJob = async (req, res) => {
     const logoToDelete_Id = job.companyLogo.public_id;
     await cloudinary.uploader.destroy(logoToDelete_Id);
         const logo = req.body.companyLogo;
-        const myCloud = await cloudinary.v2.uploader.upload(logo, {
+        const myCloud = await cloudinary.uploader.upload(logo, {
             folder: 'logo',
             crop: "scale",
         })

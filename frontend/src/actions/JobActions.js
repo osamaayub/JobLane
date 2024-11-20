@@ -14,6 +14,7 @@ export const createJobPost = createAsyncThunk(
             };
 
             const { data } = await axiosRequest.post('/create/job', jobData, config);
+            toast.success("Job Created Sucessfully");
             return data;
         } catch (err) {
             const errorMessage = err?.response?.data?.message || err.message;
