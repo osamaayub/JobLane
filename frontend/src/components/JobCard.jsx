@@ -40,7 +40,7 @@ const JobCard = ({ job }) => {
                         </div>
                         {/* Apply button positioned here for all screens */}
                         <div className='absolute md:right-3 right-0 md:pt-2 top-3'>
-                            <button className='blueCol font-semibold md:text-xs md:mt-2   text-xs px-1 py-1'>Apply</button>
+                            <button className='blueCol font-semibold md:text-sm md:mt-2   text-xs px-1 py-1'>Apply</button>
                         </div>
                     </div>
                     <div className='flex gap-2 items-center'>
