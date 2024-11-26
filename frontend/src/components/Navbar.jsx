@@ -29,7 +29,7 @@ const Navbar = () => {
             localStorage.removeItem('role');
 
             // Dispatch logout action and wait for the result
-            await dispatch(logOrNot());
+             dispatch(logOrNot());
 
             // Show success message
             toast.success("Logout Successful!");
