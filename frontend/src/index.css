@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@600&family=Open+Sans:wght@300;400;500;600;700;800&family=Phudu:wght@300;400;500;600;700;800;900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.blueCol{
+    /* background: #0041F5; */
+    background: #3803FF;
+}
+
+.blueCol:hover{
+    background: #1F00B3;
+}
+.blueColTxt:hover{
+    color: #0041F5;
+}
+.blueColTxt2{
+    color: #0041F5;
+}
+
+.LinkLog:hover{
+    background: #1F00B3;
+}
+
+
+.blueColBorder{
+    
+    border-color: #3803FF;
+}
+
+
+*{
+    font-family: 'Open Sans', sans-serif ;
+    box-sizing: border-box;
+}
+
+.underL{
+    text-decoration-color: #EAB308;
+}
+.underPur{
+    text-decoration-color: #3803FF;
+}
+
+.borBLue{
+    border-color: #0041F5;
+}
+
+.titleT{
+    font-family: 'IBM Plex Sans', sans-serif;
+
+}
+
+
+.bold-placeholder::placeholder {
+    font-weight:500; /* Make the placeholder text bold */
+    color: gray; /* You can also adjust the color if needed */
+  }
+
+
+.zInd{
+    z-index: 1000;
+}
+
+
+.blueCol2{
+    /* background: #0041F5; */
+    background: #3803FF;
+}
+
+
+/* font-family: 'Open Sans', sans-serif;
+font-family: 'Russo One', sans-serif;
+font-family: 'Ubuntu', sans-serif; */
+
+
+.loader {
+    width: 64px;
+    height: 64px;
+    position: relative;
+    background-image:
+      linear-gradient(#FFF 16px, transparent 0) ,
+      linear-gradient(#3803FF 16px, transparent 0) ,
+      linear-gradient(#3803FF 16px, transparent 0) ,
+      linear-gradient(#FFF 16px, transparent 0);
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: left top , left bottom , right top , right bottom;
+    animation: rotate 1s linear infinite;
+  }
+  @keyframes rotate {
+    0% {
+      width: 64px;
+      height: 64px;
+      transform: rotate(0deg)
+    }
+    50% {
+      width: 30px;
+      height: 30px;
+      transform: rotate(180deg)
+    }
+    100% {
+      width: 64px;
+      height: 64px;
+      transform: rotate(360deg)
+    }
+  }
+
+
+  .cool-link {
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+}
+
+.cool-link::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #EAB308 ;
+    transition: width .3s;
+}
+
+.cool-link:hover::after {
+    width: 100%;
+    transition: width .3s;
+}
+
+
+
+.loader1 {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: block;
+    margin:15px auto;
+    position: relative;
+    background: #FFF;
+    box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+    box-sizing: border-box;
+    animation: shadowPulse 2s linear infinite;
+  }
+  
+  @keyframes shadowPulse {
+    33% {
+      background: #FFF;
+      box-shadow: -24px 0 #3803FF, 24px 0 #FFF;
+    }
+    66% {
+      background: #3803FF;
+      box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+    }
+    100% {
+      background: #FFF;
+      box-shadow: -24px 0 #FFF, 24px 0 #3803FF;
+    }
+  }
+  
