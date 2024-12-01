@@ -28,7 +28,6 @@ const sendContactMessage = async (req, res) => {
       message: "Email sent successfully"
     });
   } catch (err) {
-    console.error("Error sending email:", err);
     res.status(500).json({
       success: false,
       message: "Server Error",
