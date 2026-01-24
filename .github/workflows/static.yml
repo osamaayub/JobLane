@@ -1,4 +1,4 @@
-name: HubHive  Deployment
+name: HubHive Deployment
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
 
 jobs:
   # ===================
-  # JOB 1: Build and Test in GitHub Actions
+  # JOB 1: Build in GitHub Actions
   # ===================
   build:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -38,29 +38,29 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify build output
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ Build failed - dist folder not found"
-            exit 1
-          fi
-          echo "✅ Build successful"
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
 
   # ===================
-  # JOB 2: Deploy (only if build succeeds)
+  # JOB 2: Deploy to Server
   # ===================
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
 
       - name: Set environment variables
         id: env
         run: |
-          # Determine environment based on trigger type
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             ENV="${{ github.event.inputs.environment }}"
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
@@ -70,145 +70,32 @@ jobs:
           else
             ENV="dev"
           fi
-
           echo "ENV=$ENV" >> $GITHUB_OUTPUT
 
-          if [ "$ENV" == "production" ]; then
-            echo "BRANCH=main" >> $GITHUB_OUTPUT
-            echo "REPO_PATH=/var/www/production/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
-          elif [ "$ENV" == "staging" ]; then
-            echo "BRANCH=staging" >> $GITHUB_OUTPUT
-            echo "REPO_PATH=/var/www/staging/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
-          else
-            echo "BRANCH=dev" >> $GITHUB_OUTPUT
-            echo "REPO_PATH=/var/www/dev/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Set up SSH
+      - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy with rollback protection
+      - name: Deploy dist to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
-            set -e
+          ENV="${{ steps.env.outputs.ENV }}"
+          
+          # Set server path based on environment
+          if [ "$ENV" == "production" ]; then
+            SERVER_PATH=/var/www/production/equigenix-judge-testing-fe
+          elif [ "$ENV" == "staging" ]; then
+            SERVER_PATH=/var/www/staging/equigenix-judge-testing-fe
+          else
+            SERVER_PATH=/var/www/dev/equigenix-judge-testing-fe
+          fi
 
-            # Environment variables
-            REPO_PATH="${{ steps.env.outputs.REPO_PATH }}"
-            BRANCH="${{ steps.env.outputs.BRANCH }}"
-            ENV="${{ steps.env.outputs.ENV }}"
+          echo "Deploying $ENV to $SERVER_PATH"
 
-            echo "=========================================="
-            echo "🚀 Deploying Frontend to $ENV environment"
-            echo "=========================================="
-            echo "📁 Repo: $REPO_PATH"
-            echo "🌿 Branch: $BRANCH"
-            echo "=========================================="
+          # Copy dist folder to server
+          scp -r dist/* ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH
 
-            cd $REPO_PATH
+          # Reload Nginx
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "sudo systemctl reload nginx"
 
-            # -----------------------------------------
-            # STEP 1: Backup current dist folder
-            # -----------------------------------------
-            echo ""
-            echo "📦 Creating backup of current build..."
-            if [ -d "dist" ]; then
-              rm -rf "dist_backup"
-              cp -r "dist" "dist_backup"
-              echo "✅ Backup created: dist_backup"
-            else
-              echo "⚠️ No existing dist folder to backup"
-            fi
-
-            # -----------------------------------------
-            # STEP 2: Git operations
-            # -----------------------------------------
-            echo ""
-            echo "📥 Pulling latest code..."
-            git stash || true
-            git checkout $BRANCH
-            git pull origin $BRANCH
-
-            # -----------------------------------------
-            # STEP 3: Install dependencies
-            # -----------------------------------------
-            echo ""
-            echo "📦 Installing dependencies..."
-            npm install
-
-            # -----------------------------------------
-            # STEP 4: Build with error handling
-            # -----------------------------------------
-            echo ""
-            echo "🔨 Building for $ENV..."
-            if ! npm  run build; then
-              echo "=========================================="
-              echo "❌ BUILD FAILED - Restoring backup..."
-              echo "=========================================="
-
-              if [ -d "dist_backup" ]; then
-                rm -rf "dist"
-                mv "dist_backup" "dist"
-                echo "✅ Backup restored. Server unchanged."
-              fi
-
-              exit 1
-            fi
-
-            # -----------------------------------------
-            # STEP 5: Verify build output
-            # -----------------------------------------
-            echo ""
-            echo "🔍 Verifying build output..."
-            if [ ! -d "dist" ]; then
-              echo "=========================================="
-              echo "❌ Build verification failed - dist folder not found"
-              echo "=========================================="
-
-              if [ -d "dist_backup" ]; then
-                mv "dist_backup" "dist"
-                echo "✅ Backup restored."
-              fi
-
-              exit 1
-            fi
-
-            echo "✅ Build verified successfully!"
-
-            # -----------------------------------------
-            # STEP 6: Reload Nginx
-            # -----------------------------------------
-            echo ""
-            echo "🔄 Reloading Nginx..."
-            sudo systemctl reload nginx
-
-            # -----------------------------------------
-            # STEP 7: Verify deployment
-            # -----------------------------------------
-            echo ""
-            echo "🔍 Verifying deployment..."
-            if [ -d "dist" ] && [ -f "dist/index.html" ]; then
-              # Remove backup after success
-              rm -rf "dist_backup"
-
-              echo ""
-              echo "=========================================="
-              echo "🎉 $ENV frontend deployment completed successfully!"
-              echo "=========================================="
-            else
-              echo "=========================================="
-              echo "❌ Deployment verification failed"
-              echo "🔙 Rolling back..."
-              echo "=========================================="
-
-              if [ -d "dist_backup" ]; then
-                rm -rf "dist"
-                mv "dist_backup" "dist"
-                sudo systemctl reload nginx
-                echo "✅ Rollback completed. Server restored."
-              fi
-
-              exit 1
-            fi
-          ENDSSH
+          echo "✅ Deployment completed!"
