@@ -1,110 +1,120 @@
-name: HubHive Deployment
+name: JobLane Full Deployment
 
 on:
   push:
-    branches:
-      - main
-      - staging
+    branches: [main, staging]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        type: choice
-        options:
-          - dev
-          - staging
-          - production
+
+env:
+  FRONTEND_DIR: frontend
+  BACKEND_DIR: backend
 
 jobs:
-  # ===================
-  # JOB 1: Build in GitHub Actions
-  # ===================
-  build:
+# =========================
+# FRONTEND BUILD
+# =========================
+  build-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install frontend dependencies
+        run: |
+          cd $FRONTEND_DIR
+          npm install
 
-      - name: Build application
-        run: npm run build
+      - name: Build frontend
+        run: |
+          cd $FRONTEND_DIR
+          npm run build
 
-      - name: Upload dist as artifact
-        uses: actions/upload-artifact@v4   # ✅ updated to v4
+      - name: Upload frontend dist
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist
+          name: frontend-dist
+          path: frontend/dist
 
-  # ===================
-  # JOB 2: Deploy to Server
-  # ===================
-  deploy:
+# =========================
+# DEPLOY FRONTEND
+# =========================
+  deploy-frontend:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-frontend
 
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4  # ✅ updated to v4
+      - uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: frontend-dist
           path: dist
-
-      - name: Set environment variables
-        id: env
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            ENV="${{ github.event.inputs.environment }}"
-          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            ENV="production"
-          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
-            ENV="staging"
-          else
-            ENV="dev"
-          fi
-          echo "ENV=$ENV" >> $GITHUB_OUTPUT
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy dist to server
+      - name: Deploy frontend to server
         run: |
-          ENV="${{ steps.env.outputs.ENV }}"
-
-          # Set server path based on environment
-          if [ "$ENV" == "production" ]; then
-            SERVER_PATH=/var/www/production/equigenix-judge-testing-fe
-          elif [ "$ENV" == "staging" ]; then
-            SERVER_PATH=/var/www/staging/equigenix-judge-testing-fe
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            SERVER_PATH=/var/www/production/joblane
           else
-            SERVER_PATH=/var/www/dev/equigenix-judge-testing-fe
+            SERVER_PATH=/var/www/staging/joblane
           fi
 
-          echo "Deploying $ENV to $SERVER_PATH"
-
-          # Backup current dist folder
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
-            if [ -d $SERVER_PATH/dist ]; then
-              rm -rf $SERVER_PATH/dist_backup
-              mv $SERVER_PATH/dist $SERVER_PATH/dist_backup
-              echo '✅ Backup created at dist_backup'
-            fi
+            mkdir -p $SERVER_PATH &&
+            rm -rf $SERVER_PATH/dist_backup &&
+            [ -d $SERVER_PATH/dist ] && mv $SERVER_PATH/dist $SERVER_PATH/dist_backup || true
           "
 
-          # Copy new dist to server
-          scp -r dist/* ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH/dist
+          scp -r dist ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH/
 
-          # Reload Nginx
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "sudo systemctl reload nginx"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
+            sudo systemctl reload nginx
+          "
 
-          echo "✅ Deployment completed successfully!"
+# =========================
+# DEPLOY BACKEND
+# =========================
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: deploy-frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy backend to server
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            BACKEND_PATH=/var/www/production/joblane-backend
+          else
+            BACKEND_PATH=/var/www/staging/joblane-backend
+          fi
+
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
+            mkdir -p $BACKEND_PATH
+            cd $BACKEND_PATH
+
+            if [ ! -d .git ]; then
+              git clone git@github.com:${{ github.repository }} .
+            else
+              git fetch origin
+              git reset --hard origin/${{ github.ref_name }}
+            fi
+
+            cd backend
+            npm install
+            npm run build || true
+
+            pm2 restart joblane-backend || pm2 start npm --name joblane-backend -- start
+          "
