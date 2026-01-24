@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
       - name: Upload dist as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   # ✅ updated to v4
         with:
           name: dist
           path: dist
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4  # ✅ updated to v4
         with:
           name: dist
           path: dist
@@ -80,7 +80,7 @@ jobs:
       - name: Deploy dist to server
         run: |
           ENV="${{ steps.env.outputs.ENV }}"
-          
+
           # Set server path based on environment
           if [ "$ENV" == "production" ]; then
             SERVER_PATH=/var/www/production/equigenix-judge-testing-fe
@@ -92,10 +92,19 @@ jobs:
 
           echo "Deploying $ENV to $SERVER_PATH"
 
-          # Copy dist folder to server
-          scp -r dist/* ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH
+          # Backup current dist folder
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
+            if [ -d $SERVER_PATH/dist ]; then
+              rm -rf $SERVER_PATH/dist_backup
+              mv $SERVER_PATH/dist $SERVER_PATH/dist_backup
+              echo '✅ Backup created at dist_backup'
+            fi
+          "
+
+          # Copy new dist to server
+          scp -r dist/* ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH/dist
 
           # Reload Nginx
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "sudo systemctl reload nginx"
 
-          echo "✅ Deployment completed!"
+          echo "✅ Deployment completed successfully!"
