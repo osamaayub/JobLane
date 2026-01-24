@@ -9,25 +9,26 @@ env:
   FRONTEND_DIR: frontend
   BACKEND_DIR: backend
 
-jobs:
 # =========================
 # FRONTEND BUILD
 # =========================
+jobs:
   build-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install frontend dependencies
+      - name: Install frontend dependencies (legacy peer deps)
         run: |
           cd $FRONTEND_DIR
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Build frontend
         run: |
@@ -48,7 +49,8 @@ jobs:
     needs: build-frontend
 
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
         with:
           name: frontend-dist
           path: dist
@@ -58,7 +60,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy frontend to server
+      - name: Deploy frontend
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             SERVER_PATH=/var/www/production/joblane
@@ -66,17 +68,15 @@ jobs:
             SERVER_PATH=/var/www/staging/joblane
           fi
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
-            mkdir -p $SERVER_PATH &&
-            rm -rf $SERVER_PATH/dist_backup &&
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << EOF
+            mkdir -p $SERVER_PATH
+            rm -rf $SERVER_PATH/dist_backup
             [ -d $SERVER_PATH/dist ] && mv $SERVER_PATH/dist $SERVER_PATH/dist_backup || true
-          "
+          EOF
 
           scp -r dist ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:$SERVER_PATH/
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
-            sudo systemctl reload nginx
-          "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "sudo systemctl reload nginx"
 
 # =========================
 # DEPLOY BACKEND
@@ -86,14 +86,15 @@ jobs:
     needs: deploy-frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy backend to server
+      - name: Deploy backend
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             BACKEND_PATH=/var/www/production/joblane-backend
@@ -101,12 +102,12 @@ jobs:
             BACKEND_PATH=/var/www/staging/joblane-backend
           fi
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << EOF
             mkdir -p $BACKEND_PATH
             cd $BACKEND_PATH
 
             if [ ! -d .git ]; then
-              git clone git@github.com:${{ github.repository }} .
+              git clone https://github.com/${{ github.repository }} .
             else
               git fetch origin
               git reset --hard origin/${{ github.ref_name }}
@@ -117,4 +118,4 @@ jobs:
             npm run build || true
 
             pm2 restart joblane-backend || pm2 start npm --name joblane-backend -- start
-          "
+          EOF
