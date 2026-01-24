@@ -1,92 +1,214 @@
-# Sample workflow for building and deploying a Next.js site to GitHub Pages
-#
-# To get started with Next.js see: https://nextjs.org/docs/getting-started
-#
-name: jobLane
+name: HubHive  Deployment
+
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches:
+      - main
+      - staging
   workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
 
 jobs:
-  # Build job
+  # ===================
+  # JOB 1: Build and Test in GitHub Actions
+  # ===================
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/package.json.lock" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=npm" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-            exit 0
-          else
-            echo "Unable to determine package manager"
-            exit 1
-          fi
-      - name: Setup Node
+
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          # Automatically inject basePath in your Next.js configuration file and disable
-          # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
-          #
-          # You may remove this line if you want to manage the configuration yourself.
-          static_site_generator: next
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-      - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-      - name: Build with React
-        run: ${{ steps.detect-package-manager.outputs.runner }} npm run build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
+          node-version: 20
 
-  # Deployment job
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Build failed - dist folder not found"
+            exit 1
+          fi
+          echo "✅ Build successful"
+
+  # ===================
+  # JOB 2: Deploy (only if build succeeds)
+  # ===================
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        id: env
+        run: |
+          # Determine environment based on trigger type
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            ENV="production"
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            ENV="staging"
+          else
+            ENV="dev"
+          fi
+
+          echo "ENV=$ENV" >> $GITHUB_OUTPUT
+
+          if [ "$ENV" == "production" ]; then
+            echo "BRANCH=main" >> $GITHUB_OUTPUT
+            echo "REPO_PATH=/var/www/production/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
+          elif [ "$ENV" == "staging" ]; then
+            echo "BRANCH=staging" >> $GITHUB_OUTPUT
+            echo "REPO_PATH=/var/www/staging/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
+          else
+            echo "BRANCH=dev" >> $GITHUB_OUTPUT
+            echo "REPO_PATH=/var/www/dev/equigenix-judge-testing-fe" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy with rollback protection
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
+            set -e
+
+            # Environment variables
+            REPO_PATH="${{ steps.env.outputs.REPO_PATH }}"
+            BRANCH="${{ steps.env.outputs.BRANCH }}"
+            ENV="${{ steps.env.outputs.ENV }}"
+
+            echo "=========================================="
+            echo "🚀 Deploying Frontend to $ENV environment"
+            echo "=========================================="
+            echo "📁 Repo: $REPO_PATH"
+            echo "🌿 Branch: $BRANCH"
+            echo "=========================================="
+
+            cd $REPO_PATH
+
+            # -----------------------------------------
+            # STEP 1: Backup current dist folder
+            # -----------------------------------------
+            echo ""
+            echo "📦 Creating backup of current build..."
+            if [ -d "dist" ]; then
+              rm -rf "dist_backup"
+              cp -r "dist" "dist_backup"
+              echo "✅ Backup created: dist_backup"
+            else
+              echo "⚠️ No existing dist folder to backup"
+            fi
+
+            # -----------------------------------------
+            # STEP 2: Git operations
+            # -----------------------------------------
+            echo ""
+            echo "📥 Pulling latest code..."
+            git stash || true
+            git checkout $BRANCH
+            git pull origin $BRANCH
+
+            # -----------------------------------------
+            # STEP 3: Install dependencies
+            # -----------------------------------------
+            echo ""
+            echo "📦 Installing dependencies..."
+            npm install
+
+            # -----------------------------------------
+            # STEP 4: Build with error handling
+            # -----------------------------------------
+            echo ""
+            echo "🔨 Building for $ENV..."
+            if ! npm  run build; then
+              echo "=========================================="
+              echo "❌ BUILD FAILED - Restoring backup..."
+              echo "=========================================="
+
+              if [ -d "dist_backup" ]; then
+                rm -rf "dist"
+                mv "dist_backup" "dist"
+                echo "✅ Backup restored. Server unchanged."
+              fi
+
+              exit 1
+            fi
+
+            # -----------------------------------------
+            # STEP 5: Verify build output
+            # -----------------------------------------
+            echo ""
+            echo "🔍 Verifying build output..."
+            if [ ! -d "dist" ]; then
+              echo "=========================================="
+              echo "❌ Build verification failed - dist folder not found"
+              echo "=========================================="
+
+              if [ -d "dist_backup" ]; then
+                mv "dist_backup" "dist"
+                echo "✅ Backup restored."
+              fi
+
+              exit 1
+            fi
+
+            echo "✅ Build verified successfully!"
+
+            # -----------------------------------------
+            # STEP 6: Reload Nginx
+            # -----------------------------------------
+            echo ""
+            echo "🔄 Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            # -----------------------------------------
+            # STEP 7: Verify deployment
+            # -----------------------------------------
+            echo ""
+            echo "🔍 Verifying deployment..."
+            if [ -d "dist" ] && [ -f "dist/index.html" ]; then
+              # Remove backup after success
+              rm -rf "dist_backup"
+
+              echo ""
+              echo "=========================================="
+              echo "🎉 $ENV frontend deployment completed successfully!"
+              echo "=========================================="
+            else
+              echo "=========================================="
+              echo "❌ Deployment verification failed"
+              echo "🔙 Rolling back..."
+              echo "=========================================="
+
+              if [ -d "dist_backup" ]; then
+                rm -rf "dist"
+                mv "dist_backup" "dist"
+                sudo systemctl reload nginx
+                echo "✅ Rollback completed. Server restored."
+              fi
+
+              exit 1
+            fi
+          ENDSSH
